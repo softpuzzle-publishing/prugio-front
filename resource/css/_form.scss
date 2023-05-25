@@ -1,0 +1,84 @@
+/* checkbox/radio */
+.new-pre-form-check {
+  display: block;
+  min-height: 20px;
+  padding-left: 2.125em;
+  .form-check-input {
+    float: left;
+    margin-left: -2.125em;
+  }
+  .form-check-input {
+    width: 20px;
+    height: 20px;
+    vertical-align: top;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    appearance: none;
+
+    &[type="checkbox"] {
+      border: 0;
+      background-image: url('../images/checkbox.svg');
+      background-color: transparent;
+      border-radius: 0.25em;
+    }
+
+    &[type="radio"] {
+      border-radius: 50%;
+    }
+
+    &:checked {
+      background-color: $primary;
+      border-color: $primary;
+
+      &[type="checkbox"] {
+        border-radius: 50rem;
+        background-image: url('../images/checkbox-checked.svg');
+      }
+
+      &[type="radio"] {
+          background-color: #fff;border: 1px solid $primary;
+          background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-3 -3 6 6'%3e%3ccircle r='2' fill='%230f4f51'/%3e%3c/svg%3e");
+        ~ .form-check-label{color: $primary;}
+      }
+    }
+
+    &:disabled {
+      pointer-events: none;
+      filter: none;
+      opacity: .5;
+    }
+
+    &[disabled],
+    &:disabled {
+      ~ .form-check-label {
+        opacity:.5;
+      }
+    }
+  }
+
+  .form-check-label {
+    font-size: 16px;color: #2D3338;
+  }
+
+  &.form-check-inline {
+    display: inline-block;
+    margin-right: 1rem;
+    vertical-align: middle;
+  }
+}
+
+.new-pre-form-group{
+  display: flex;flex-direction: column;gap: 14px;
+  .form-label{
+    font-size: 16px;font-weight: 500;color: #000;
+  }
+  & + .new-pre-form-group{margin-top: 24px;}
+}
+
+textarea.new-pre-form-control{
+  border: 1px solid $border-color;padding: 8px 16px;width: 100%;font-size: 16px;line-height: 22px;
+  &:focus{border-color: $primary;outline: 0;}
+}

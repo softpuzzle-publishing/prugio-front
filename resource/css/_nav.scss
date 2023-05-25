@@ -1,0 +1,36 @@
+.new-pre-header{
+  position: fixed;top: 0;z-index: 99;width: 100%;min-height: $nav-height;flex-shrink: 0;
+}
+.new-pre-nav{
+  display: flex;align-items: center;gap: 12px;height: $nav-height;padding: 0 16px;background: #fff;
+}
+
+.new-pre-page-title{
+  font-size: 16px;font-weight: 700;color: #000;
+  transition: .5s ease-in-out;
+}
+
+.new-pre-address{
+  display: flex;gap: 4px;padding: 10px 16px;height: $address-height;background: #fff;
+  transition: .5s;
+  svg{transition: .5s;margin-top: 2px;}
+  .my-address{
+    transition: .5s;min-width: 0;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;word-break: break-all;
+    > div{
+      font-size: 16px;font-weight: 500;color: #000;line-height: 24px;margin-right: 1px;
+    }
+  }
+}
+
+html.title-animated{
+  .has-fixed-tab{
+    .new-pre-page-title{opacity: 0;}
+    .new-pre-address{
+      margin: -49px 0 0 15px;
+      svg{transform: scale(0)}
+      .my-address{
+        > div{font-size: 16px;font-weight: 700;display: inline;}
+      }
+    }
+  }
+}
