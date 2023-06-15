@@ -40,13 +40,16 @@
   .btn-my-apart-select{
     background: #fff;width: 100%;height: 54px;border-radius: 8px;text-align: left;font-size: 15px;font-weight: 500;padding: 0 16px;color: #2D3338;
     display: flex;align-items: center;gap: 4px;
-    span{flex-grow: 1;}
+    span{flex-grow: 1;font-weight: 500;}
     &::before{
       content: '';display: block;background: url("data:image/svg+xml,%3Csvg width='16' height='17' viewBox='0 0 16 17' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M8 2.5C6.54182 2.50165 5.14383 3.08165 4.11274 4.11274C3.08165 5.14383 2.50165 6.54182 2.5 8C2.5 12.7063 7.5 16.2625 7.7125 16.4125C7.79766 16.4692 7.89769 16.4995 8 16.4995C8.10231 16.4995 8.20234 16.4692 8.2875 16.4125C8.5 16.2625 13.5 12.7063 13.5 8C13.4983 6.54182 12.9184 5.14383 11.8873 4.11274C10.8562 3.08165 9.45818 2.50165 8 2.5ZM8 6C8.39556 6 8.78224 6.1173 9.11114 6.33706C9.44004 6.55682 9.69638 6.86918 9.84776 7.23463C9.99913 7.60009 10.0387 8.00222 9.96157 8.39018C9.8844 8.77814 9.69392 9.13451 9.41421 9.41421C9.13451 9.69392 8.77814 9.8844 8.39018 9.96157C8.00222 10.0387 7.60009 9.99913 7.23463 9.84776C6.86918 9.69638 6.55682 9.44004 6.33706 9.11114C6.1173 8.78224 6 8.39556 6 8C6 7.46957 6.21071 6.96086 6.58579 6.58579C6.96086 6.21071 7.46957 6 8 6Z' fill='%2331556A'/%3E%3C/svg%3E%0A") no-repeat 0 0;width: 16px;height: 17px;
     }
     &::after{
       content: '';
-      background: url("data:image/svg+xml,%3Csvg width='20' height='21' viewBox='0 0 20 21' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15.834 8L10.0007 13.8333L4.16732 8' stroke='%239DA4AA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A") no-repeat 0 0;width: 20px;height: 21px;
+      background: url("data:image/svg+xml,%3Csvg width='20' height='21' viewBox='0 0 20 21' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15.834 8L10.0007 13.8333L4.16732 8' stroke='%239DA4AA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A") no-repeat 0 0;width: 20px;height: 21px;transition: transform .2s;
+    }
+    &.active{
+      &::after{transform: rotate(180deg);}
     }
   }
   .date{

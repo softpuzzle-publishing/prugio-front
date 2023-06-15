@@ -423,6 +423,7 @@ textarea.new-pre-form-control:focus {
 }
 .new-pre-index .btn-my-apart-select span {
   flex-grow: 1;
+  font-weight: 500;
 }
 .new-pre-index .btn-my-apart-select::before {
   content: "";
@@ -436,6 +437,10 @@ textarea.new-pre-form-control:focus {
   background: url("data:image/svg+xml,%3Csvg width='20' height='21' viewBox='0 0 20 21' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M15.834 8L10.0007 13.8333L4.16732 8' stroke='%239DA4AA' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A") no-repeat 0 0;
   width: 20px;
   height: 21px;
+  transition: transform 0.2s;
+}
+.new-pre-index .btn-my-apart-select.active::after {
+  transform: rotate(180deg);
 }
 .new-pre-index .date {
   background: rgba(255, 255, 255, 0.3);

@@ -129,15 +129,19 @@
     </div>
   </div>
   <script>
+    /* 단지선택 모달 열기 */
     $(".btn-my-apart-select").on("click", function () {
+      $(".btn-my-apart-select").addClass("active");
       $(".new-pre-modal").addClass("show");
       $(".new-pre-modal .dim").addClass("active");
       $(".new-pre-modal-content").addClass("active");
     });
+    /* 단지선택 모달 닫기 */
     $("[data-close=modal]").on("click", function () {
       const $target = $(this).closest(".new-pre-modal");
       $target.find(".new-pre-modal-content").removeClass("active");
       $target.find(".dim").removeClass("active");
+      $(".btn-my-apart-select").removeClass("active");
 
       setTimeout(function () {
         $target.removeClass("show");
