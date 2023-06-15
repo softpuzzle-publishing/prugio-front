@@ -22,6 +22,14 @@
   background: #fff;
 }
 
+.new-pre-header{
+  position: fixed;top: 0;z-index: 99;width: 100%;min-height: $nav-height;flex-shrink: 0;
+}
+
+.new-pre-body{
+  flex-grow: 1;
+}
+
 /* jquery mobile page 애니메이션 삭제 (ios 이슈) */
 .ui-page{
   -webkit-animation-duration: 0ms !important;-moz-animation-duration: 0ms !important;
