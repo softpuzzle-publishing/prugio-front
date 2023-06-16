@@ -29,8 +29,3 @@
 .new-pre-body{
   flex-grow: 1;
 }
-
-/* jquery mobile page 애니메이션 삭제 (ios 이슈) */
-.ui-page{
-  -webkit-animation-duration: 0ms !important;-moz-animation-duration: 0ms !important;
-}

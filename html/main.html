@@ -1,0 +1,1947 @@
+<html class="ui-mobile">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta http-equiv="cleartype" content="on">
+  <meta id="viewPortSet" name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+  <!-- <meta http-equiv="Expires" content="-1"> -->
+  <!-- <meta http-equiv="Pramma" content="no-cache"> -->
+  <!-- <meta http-equiv="Cache-Control" content="No-Cache"> -->
+  <title>푸르지오</title>
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/js/config.js"></script>
+  <!-- <script src="https://app.prugiocs.com/contents/pages/pm/resource/js/imports.js"></script> -->
+  <meta name="format-detection" content="telephone=no">
+  <link href="https://app.prugiocs.com/contents/pages/pm/resource/css/jquery.mobile-1.2.0.css" rel="stylesheet">
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/lib/jquery-1.11.3.min.js"></script>
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/lib/jquery.alerts-1.1/jquery.alerts.js"></script>
+  <link rel="stylesheet" href="https://app.prugiocs.com/contents/pages/pm/resource/lib/jquery.alerts-1.1/jquery.alerts.css">
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/js/common.js"></script>
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/js/storage.js"></script>
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/js/global.system.js"></script>
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/lib/gibberish-aes.js"></script>
+  <link href="https://app.prugiocs.com/contents/pages/pm/resource/css/ay_com.css?_=20200521" rel="stylesheet">
+  <link href="https://app.prugiocs.com/contents/pages/pm/resource/css/layout.css?_=20200521" rel="stylesheet">
+  <link href="https://app.prugiocs.com/contents/pages/pm/resource/css/cont.css?_=20200521" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons|Material+Icons+Outlined" rel="stylesheet">
+  <link href="https://app.prugiocs.com/contents/pages/pm/resource/css/icon.css?_=20200521" rel="stylesheet">
+  <!-- <script type="text/javascript" id="cordova" src="https://app.prugiocs.com/cordova.js"></script> -->
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/lib/jquery.mobile.custom.js"></script>
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/lib/jquery.model.js"></script>
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/js/ui.js"></script>
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/js/turn.js"></script>
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/js/acco.js"></script>
+  <link href="https://app.prugiocs.com/contents/pages/pm/resource/css/slick.css?_=20200521" rel="stylesheet">
+  <script src="https://app.prugiocs.com/contents/pages/pm/resource/lib/slick.min.js" charset="utf-8"></script>
+
+  <link rel="stylesheet" href="../resource/css/new-pre.css">
+  <script src="../resource/js/new-pre.js" defer></script>
+</head>
+
+<body>
+  <div class="remain">
+    <header>
+      <!--[if lte IE 9]><script src="../lib/placeholders.min.js" charset="utf-8"></script><![endif]-->
+      <script type="text/javascript">
+        var mainViewParam = locationParameter();
+        var localDefRcvBasInfoDataList = null;
+        var isMainChildHousAgrm = false;
+        var isMainLunchRequest = false;
+        var isMainSubfacltAgrm = false;
+        var isMainDeschgAgrm = false;
+        var isExistUnregiList = false;
+        var unregiListCnt = 0;
+        var isAlertLunchNotice = false;
+        var isMainCareChildHousAgrm = false;  // 2022.10.10 다함께돌봄
+
+        $(document).ready(function () {
+          $('#mainLunchSiteInfo').bind("change", function () {
+            if ($(this).val() != "") {
+              var valArr = $(this).val().split(";");
+              setSessionStorage("selectLunchSiteCd", valArr[0]);
+              setSessionStorage("selectLunchDongNm", valArr[1]);
+              setSessionStorage("selectLunchHoseNm", valArr[2]);
+              setSessionStorage("selectLunchBrndCd", valArr[3]);
+
+              lunchSiteSelect(valArr[0]);
+              setTimeout("fn_mainLayerPosition()", 1000);
+            }
+          });
+
+          if (mainViewParam.cb != null && mainViewParam.cb == "1") {
+            $(".popup3_header_close").hide();
+          }
+          //슬라이드 배너
+          //getBannerInfo();//단지 매칭을 위한 개편으로 이동함.
+
+          getCommonInfoLoad(); //2022.10.01 공통코드 호출 추가함
+        });
+
+        function popup3_close() {
+          console.log("CALL popup3_close");
+          // kakao 챗봇에서 호출해서 사용해서  닫기 시 챗봇창이 닫히게 하기 위해서 추가됨.
+          if (navigator.userAgent.toLocaleLowerCase().search("kakaotalk") > -1) {
+            location.href = "kakaotalk://inappbrowser/close";
+          } else {
+            window.close();
+          }
+        }
+
+        function fn_getLocalDefRcvbasInfo() {
+          initAppLocalDB();//데이터베이스
+          var callQueryStr = "	SELECT 	A.* "
+            + "			,B.APPN_ST_DT "
+            + "			,B.APPN_ED_DT "
+            + "			,B.APPN_CF_ED_DT "
+            + "		FROM DEF_RCV_BAS AS A "
+            + "		LEFT JOIN SITE_LIST AS B "
+            + "			ON B.SITE_CD = A.SITE_CD "
+            + "			AND B.DONG_CD = A.DONG_CD "
+            + "			AND B.HOSE_CD = A.HOSE_CD "
+            + "		ORDER BY SITE_CD, DONG_CD, HOSE_CD, MID DESC";
+          callAppLocalDB(callQueryStr, null, function (status, result) {
+            if (status) {
+              if (result.rows.length > 0) {
+                localDefRcvBasInfoDataList = result.rows;
+                /*
+                var mergeLocalDefRcvBasInfoData = {};
+                var localDefRcvBasInfoData = result.rows;
+                for(var i=0; i<localDefRcvBasInfoData.length; i++) {
+                  var arr = {'lock':false,'cnt':0};
+                  var item = localDefRcvBasInfoData.item(i);
+                  if(mergeLocalDefRcvBasInfoData.hasOwnProperty(item.SITE_CD)) {
+                    arr = mergeLocalDefRcvBasInfoData[item.SITE_CD];
+                    arr['cnt'] += 1;
+                    if(isRequestLock(localDefRcvBasInfoData.item(i).APPN_ED_DT,'after')) { //종료
+                      arr['lock'] = true;
+                      mergeLocalDefRcvBasInfoData[item.SITE_CD] = arr;
+                    } else {
+                      mergeLocalDefRcvBasInfoData[item.SITE_CD] = arr;
+                    }
+                  } else {
+                    arr['cnt'] = 1;
+                    if(isRequestLock(localDefRcvBasInfoData.item(i).APPN_ED_DT,'after')) { //종료
+                      arr['lock'] = true;
+                      mergeLocalDefRcvBasInfoData[item.SITE_CD] = arr;
+                    } else {
+                      mergeLocalDefRcvBasInfoData[item.SITE_CD] = arr;
+                    }
+                  }
+
+                }
+                console.log(mergeLocalDefRcvBasInfoData);
+                */
+                /*
+                var isLock = true;
+                var unregiCnt = 0;
+                var localDefRcvBasInfoData = result.rows;
+                for(var i=0; i<localDefRcvBasInfoData.length; i++) {
+                  var item = localDefRcvBasInfoData.item(i);
+                  if(!isRequestLock(localDefRcvBasInfoData.item(i).APPN_ED_DT,'after')) { //종료
+                    isLock = false;
+                    unregiCnt += 1;
+                  }
+                }
+                if(!isLock) {
+                  isExistUnregiList = true;
+                  unregiListCnt = unregiCnt;//result.rows.length;
+                }
+                */
+              } else {
+                localDefRcvBasInfoDataList = null;
+              }
+            }
+          });
+        }
+
+        function fn_page_main() {
+
+          if (appCheck()) {//앱일 경우
+            if (getDevice() == "iOS") {
+              setTimeout(function () {
+                fn_getLocalDefRcvbasInfo();
+              }, 100);
+
+            } else {
+              fn_getLocalDefRcvbasInfo();
+            }
+          }
+
+          var userName = getSessionStorage("userName");
+          if (storageEmpty(userName)) getLunchAuthCheck();
+
+          getMenu();
+
+          //확인하지 않은 알람 New 표시
+          $('.new_icon').hide();
+
+          if (storageEmpty(userName)) getNewAlarmCheck();
+
+          // 		if (appCheck()) $('.mainFooter').css("display", "none");
+
+          //$('.main_f').find(".swiper-wrapper").html("");
+
+          /*
+          $('#mainBannerIfr').load(function() { //높이를 잘 못가져와서 새로 수정 - 2019.08.22 수정 - 앱에서 실패 - height="80vh" 처리
+            var iframeHeight = $(this).contents().find('#main-banner').height();
+          console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> '+iframeHeight);
+            return;
+            if(iframeHeight <= 0) {
+              iframeHeight = getSessionStorage("mainSliderIframeHeight");
+            } else{
+              setSessionStorage("mainSliderIframeHeight", iframeHeight);
+            }
+            $(this).height(iframeHeight);
+          });
+          */
+
+          setMainSiteBatch();
+          //공지,도시락 팝업 노출시간 조정 - 2019.08.29
+          setTimeout(function () { mainLinkCheck(); }, 500);
+          //
+          setMainBanner();
+
+        }
+
+
+        function setMainBanner() {
+          //없어지면 에러발생
+        }
+
+
+        function mainLinkCheck() {
+          var menuMst = getLocalStorage("menuMst");
+          if (menuMst != null) {
+            $.each($('.main_link').find("li"), function () {
+              var viewSw = false;
+              var value = $(this).attr("onclick");
+              //console.log("value : " + value);
+              var menuArg = JSON.parse(menuMst);	//스토리지에 담긴 메뉴정보를 JSON으로 파싱
+              $.each(menuArg, function (idx) {
+                if (value.indexOf(menuArg[idx].menuCd) > -1) {
+                  viewSw = true;
+                  return false;
+                }
+              });
+
+              if (viewSw) {
+                $(this).show();
+              } else {
+                $(this).hide();
+              }
+            });
+
+            var bottomlink = ["PMCS030", "PMCS031"];
+            for (var i = 0; i < bottomlink.length; i++) {
+              var viewSw = false;
+              var menuArg = JSON.parse(menuMst);	//스토리지에 담긴 메뉴정보를 JSON으로 파싱
+              $.each(menuArg, function (idx) {
+                if (bottomlink[i] == menuArg[idx].menuCd) {
+                  viewSw = true;
+                  return false;
+                }
+              });
+
+              var obj = $('#bottomLink01');
+              if (bottomlink[i] == "PMCS031") obj = $('#bottomLink02');
+
+              if (viewSw) {
+                $(obj).show();
+              } else {
+                $(obj).hide();
+              }
+            }
+          }
+        }
+
+        $(function () {
+
+          $('div.check-group input').each(function () {
+            if ($(this).attr('checked') == 'checked') {
+              $(this).next().addClass('checked');
+
+            }
+          });
+
+          $('div.check-group label').click(function () {
+            if ($(this).hasClass('checked')) {
+              $(this)
+                .removeClass('checked')
+                .prev('input').removeAttr('checked');
+            } else {
+              $(this)
+                .addClass('checked')
+                .prev('input').attr('checked', 'checked');
+            }
+          });
+        });
+
+
+        $(function () {
+          var radio = $('div.radio-group');
+          $('input', radio).css({ 'opacity': '0' })
+            //checkedだったら最初からチェックする
+            .each(function () {
+              if ($(this).attr('checked') == 'checked') {
+                $(this).next().addClass('checked');
+              }
+            });
+
+          $('label', radio).click(function () {
+            $(this).parent().parent().each(function () {
+              $('label', this).removeClass('checked');
+            });
+            $(this).addClass('checked');
+          });
+        });
+
+        function MM_jumpMenu(targ, selObj, restore) { //v3.0
+          eval(targ + ".location='" + selObj.options[selObj.selectedIndex].value + "'");
+          if (restore) selObj.selectedIndex = 0;
+        }
+
+        //새로운 알람 여부 확인
+        function getNewAlarmCheck() {
+          var params = '{"input":{"userId":"' + getLocalStorage("j_username") + '"}}';
+          $.ajax({
+            url: baseUrl + "/pm/pma01/pma0101/getNewAlarm",
+            type: "POST",
+            data: params,
+            contentType: "application/json+sua",
+            async: false,
+            success: function (data) {
+              //console.log("data : " + JSON.stringify(data));
+              if (data.sw) $('.new_icon').show();
+            },
+            error: function (request, status, error) {
+              console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+            }
+          });
+        }
+
+        function getLunchAuthCheck() {
+          var params = '{"input":{"userId":"' + getLocalStorage("j_username") + '"}}';
+          $.ajax({
+            url: baseUrl + "/pm/pmg01/pmg0101/selectLunchAuthCount",
+            type: "POST",
+            data: params,
+            contentType: "application/json+sua",
+            async: false,
+            success: function (data) {
+              // 				console.log("data : " + JSON.stringify(data));
+              if (data.lunchAuthCnt > 0) setSessionStorage("lunchAuthUser", "Y");
+            },
+            error: function (request, status, error) {
+              console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+            }
+          });
+        }
+
+
+        //2019.08.22 중간 메뉴 처리
+        function setMainInnerBoxMenuBatch() {
+          //로그인 여부
+          var userName = getSessionStorage("userName");
+          var isLoginYn = false;
+          if (userName != null) {
+            isLoginYn = true;
+          }
+          //단지정보 여부
+          var isSiteCd = false;
+          var selectSiteCdTmp = getSessionStorage("selectSiteCd");
+          if (storageEmpty(selectSiteCdTmp)) {
+            isSiteCd = true;
+          }
+          $('.inner-box > .inner').html('');//메뉴구성초기화
+
+          var menuBox = '';
+          if (isSiteCd) {
+            menuBox += '<h2 class="mainDefRcvBasMenuBody" style="display:none;">사전 확인 </h2>';
+            menuBox += '<ul class="c-menu-list mainDefRcvBasMenuBody" style="display:none;">';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pmf01/pmf0101/asHouse\', \'PMCS039\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon8"></div>';
+            menuBox += '			<div class="text">My단지<br>관리</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenuOffline(\'/pm/pmc01/pmc0101/requestPre\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon1"></div>';
+            menuBox += '			<div class="text">사전확인<br>신청</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pmc01/pmc0101/preList\', \'PMCS050\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon2"></div>';
+            menuBox += '			<div class="text">사전확인<br>접수내역</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '</ul>';
+
+            menuBox += '<h2>납부 안내 <a href="javascript:goMenu(\'/pm/pmd01/pmd0101/allotmentGuide\', \'PMCS014\')" class="floatR">분양금 납부 가이드 <i class="material-icons"> arrow_forward_ios</i></a></h2>';
+            menuBox += '<ul class="c-menu-list">';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pmd01/pmd0101/allotment\', \'PMCS010\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon3"></div>';
+            menuBox += '			<div class="text">분양금<br>조회</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pmd01/pmd0101/calculation\', \'PMCS011\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon4"></div>';
+            menuBox += '			<div class="text">선납/연체금<br>계산</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pmd01/pmd0101/account\', \'PMCS012\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon5"></div>';
+            menuBox += '			<div class="text">가상계좌<br>안내</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '</ul>';
+            menuBox += '<h2>입주 안내 <a href="javascript:goMenu(\'/pm/pme01/pme0101/moveInGuide\', \'PMCS026\')" class="floatR">입주가이드 <i class="material-icons"> arrow_forward_ios</i></a></h2>';
+            menuBox += '<ul class="c-menu-list">';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pme01/pme0101/dwellInfo\', \'PMCS019\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon6"></div>';
+            menuBox += '			<div class="text">입주안내</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pme01/pme0101/visitHomeAgree\', \'PMCS020\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon7"></div>';
+            menuBox += '			<div class="text">내집방문예약</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pme01/pme0101/moveInAgree\', \'PMCS023\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon8"></div>';
+            menuBox += '			<div class="text">입주예약</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '</ul>';
+            menuBox += '<h2>서류신청/발급 </h2>';
+            menuBox += '<ul class="c-menu-list col-2">';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pmd01/pmd0101/payment\', \'PMCS013\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon9"></div>';
+            menuBox += '			<div class="text">분양금납부<br>확인서</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:pageMove(\'/pm/pmf01/pmf0101/requestMoveInPapers\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon10"></div>';
+            menuBox += '			<div class="text">입주예정<br>확인서</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '</ul>';
+          } else {
+            menuBox += '<h2>AS 접수 </h2>';
+            menuBox += '<ul class="c-menu-list col-1">';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pmc01/pmc0101/requestAS\', \'PMCS007\')" class="btn">';
+            menuBox += '			<div>';
+            menuBox += '			  <div class="remain_icon icon1"></div>';
+            menuBox += '			  <div class="text">사전확인 신청</div>';
+            menuBox += '      </div>';
+            menuBox += '			<div>';
+            menuBox += '			<small class="arrow">신청하기</small>';
+            menuBox += '			</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '</ul>';
+            menuBox += '<h2>입주 안내 <a href="javascript:goMenu(\'/pm/pme01/pme0101/moveInGuide\', \'PMCS026\')" class="floatR">입주가이드 <i class="material-icons"> arrow_forward_ios</i></a></h2>';
+            menuBox += '<ul class="c-menu-list col-2">';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pme01/pme0101/dwellInfo\', \'PMCS019\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon6"></div>';
+            menuBox += '			<div class="text">입주안내</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pme01/pme0101/moveInAgree\', \'PMCS023\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon8"></div>';
+            menuBox += '			<div class="text">입주예약</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '</ul>';
+            menuBox += '<h2>서류신청/발급 </h2>';
+            menuBox += '<ul class="c-menu-list col-2">';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pmd01/pmd0101/payment\', \'PMCS013\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon9"></div>';
+            menuBox += '			<div class="text">분양금납부<br>확인서</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '	<li>';
+            menuBox += '		<a href="javascript:goMenu(\'/pm/pmf01/pmf0101/requestMoveInPapers\', \'\')" class="btn">';
+            menuBox += '			<div class="remain_icon icon10"></div>';
+            menuBox += '			<div class="text">입주예정<br>확인서</div>';
+            menuBox += '		</a>';
+            menuBox += '	</li>';
+            menuBox += '</ul>';
+          }
+
+          if (isLoginYn) {
+            menuBox += '<h2></h2>';
+            menuBox += '<ul class="c-menu-block mainSiteSvcBody" style="display:none;">';
+            menuBox += '	<li>';
+            menuBox += '        <div class="btn">';
+            //              menuBox += '        <a href="javascript:goMenu(\'/pm/pmg04/pmg0401/siteSvcList\', \'PMCS013\')" class="btn">';
+            menuBox += '            <div class="remain_icon icon11"></div>';
+            menuBox += '            <div class="text">My단지 서비스 신청</div>';
+            menuBox += '            <a href="javascript:goMenu(\'/pm/pmg04/pmg0401/siteSvcList\', \'PMCS023\')" class="floatR">참여하기 <i class="material-icons"> arrow_forward_ios</i></a>';
+            //              menuBox += '        </a>';
+            menuBox += '	</li>';
+            menuBox += '</ul>';
+
+            menuBox += '<div class="icon-chatbot" style="margin-bottom:10%">';
+            var urlChatbotLink = "https://api.happytalk.io/api/kakao/chat_open?yid=%40%EB%8C%80%EC%9A%B0%EA%B1%B4%EC%84%A4%ED%91%B8%EB%A5%B4%EC%A7%80%EC%98%A4&site_id=5000001030&category_id=121225&division_id=121226&id=";
+            var uid = getLocalStorage("j_username");
+            if (!appCheck()) {//앱일 경우
+              if (getDevice() == "iOS") {
+                menuBox += '	<a href="javascript:cordova.InAppBrowser.open(\'' + urlChatbotLink + uid + '\', \'_system\')"><img src="https://happytalk.io/assets/main/img/btn-chat-kakao.png"></a>';
+              } else {
+                menuBox += '	<a href="' + urlChatbotLink + uid + '" target="_blank"><img src="https://happytalk.io/assets/main/img/btn-chat-kakao.png"></a>';
+              }
+            } else {
+              menuBox += '	<a href="' + urlChatbotLink + uid + '" target="_blank"><img src="//happytalk.io/assets/main/img/btn-chat-kakao.png"></a>';
+            }
+            menuBox += '</div>';
+          }
+
+          menuBox += '<h2 class="mainChildLunchBody" style="display:none;">동의 및 신청 현황 </h2>';
+          menuBox += '<ul class="c-menu-block mainChildLunchBody" style="display:none;">';
+          menuBox += '	<li id="mainChildHousAgrmBtn">';
+          menuBox += '		<div class="btn">';
+          menuBox += '			<div class="remain_icon icon12"></div>';
+          menuBox += '			<div class="text">국공립어린이집 동의</div>';
+          menuBox += '			<a class="floatR" id="mainChildHousAgrmBtnLabel" style="display:none;">참여하기</a>';
+          menuBox += '			<span class="floatR" id="mainChildHousAgrmBtnLabelSpan" style="display:none;">신청완료</span>';
+          menuBox += '		</div>';
+          menuBox += '	</li>';
+
+          // 2022.10.10 ryu 메뉴추가
+          menuBox += '	<li id="mainCareChildHousAgrmBtn">';
+          menuBox += '		<div class="btn">';
+          menuBox += '			<div class="remain_icon icon12"></div>';
+          menuBox += '			<div class="text">다함께돌봄센터 설치 동의</div>';
+          menuBox += '			<a class="floatR" id="mainCareChildHousAgrmBtnLabel" style="display:none;">참여하기</a>';
+          menuBox += '			<span class="floatR" id="mainCareChildHousAgrmBtnLabelSpan" style="display:none;">신청완료</span>';
+          menuBox += '		</div>';
+          menuBox += '	</li>';
+
+          menuBox += '	<li id="mainLunchRequestBtn">';
+          menuBox += '		<div class="btn">';
+          menuBox += '			<div class="remain_icon icon13"></div>';
+          menuBox += '			<div class="text">웰컴밀 신청</div>';
+          menuBox += '			<a class="floatR" id="mainLunchRequestBtnLabel" style="display:none;">신청하기</a>';
+          menuBox += '			<span class="floatR" id="mainLunchRequestBtnLabelSpan" style="display:none;">신청완료</span>';
+          menuBox += '	    </div>';
+          menuBox += '    </li>';
+          menuBox += '	<li id="mainSubfacltAgrmBtn">';
+          menuBox += '		<div class="btn">';
+          menuBox += '			<div class="remain_icon icon14"></div>';
+          menuBox += '			<div class="text">그리너리 라운지 조기 오픈</div>';
+          menuBox += '			<a class="floatR" id="mainSubfacltAgrmBtnLabel" style="display:none;">신청하기</a>';
+          menuBox += '			<span class="floatR" id="mainSubfacltAgrmBtnLabelSpan" style="display:none;">신청완료</span>';
+          menuBox += '	    </div>';
+          menuBox += '	</li>';
+          menuBox += '    <li id="mainDeschgAgrmBtn">';
+          menuBox += '        <div class="btn">';
+          menuBox += '            <div class="remain_icon icon15"></div>';
+          menuBox += '            <div class="text">설계변경동의</div>';
+          menuBox += '            <a class="floatR" id="mainDeschgAgrmBtnLabel" style="display:none;">참여하기</a>';
+          menuBox += '            <span class="floatR" id="mainDeschgAgrmBtnLabelSpan" style="display:none;">신청완료</span>';
+          menuBox += '        </div>';
+          menuBox += '    </li>';
+          menuBox += '</ul>';
+          $('.inner-box > .inner').html(menuBox);
+        }
+
+        //2019.08.12 메인 단지 선택 로직
+        function setMainSiteBatch() {
+          var userName = getSessionStorage("userName");
+          if (userName != null) { //로그인 한 사용자
+            isMainChildHousAgrm = false;
+            isMainLunchRequest = false;
+            isMainSubfacltAgrm = false;
+            isMainCareChildHousAgrm = false; // 2022.10.10 다함께 돌봄
+
+            var cterInfo = getSessionStorage("cterInfo");
+            var selectSiteCd = '';
+            var selectDongNm = '';
+            var selectHoseNm = '';
+            if (storageEmpty(cterInfo)) {
+              selectSiteCd = getSessionStorage("selectSiteCd");
+              selectDongNm = getSessionStorage("selectDongNm");
+              selectHoseNm = getSessionStorage("selectHoseNm");
+            }
+
+            var realTimeCterInfo;
+            var htmlSelectBox = '';
+            var params = '{"input":{ "userId":"' + getLocalStorage("j_username") + '" }}';
+
+            //  ------------- 로컬 테스트용 -----------------------
+            // params = '{"input":{ "userId":"manuday83" }}';
+            //  ------------- 로컬 테스트용 -----------------------
+
+            ajaxParamExecute(params, baseUrl + "/pm/pma01/pma0101/getCterInfo", "POST", function (data) {
+              var userInfo = data.userInfo;
+              console.log("=================userInfo=======================" + JSON.stringify(userInfo))
+
+              //  ------------- 로컬 테스트용 -----------------------
+              /*
+              userInfo.cterInfo =	[
+                  {"hsngtpNm":"17.62","pernm":"류도영","prugioBrndClscd":"01","mycoMgmDongYn":"Y"
+                    ,"hoseNm":"1112","dongCd":"2","sellKindNm":"오피스텔","siteCd":"AADWA","hoseCd":"0101"
+                    ,"sellKindCd":"02","ctYmd":"20180312","dongNm":"101","siteNm":"송파파크하이보푸르지오"
+                    ,"atchFileId":"0","fileId":"0"}
+              ]
+              */
+              //  ------------- 로컬 테스트용 -----------------------
+
+              if (userInfo != null && userInfo.cterInfo != null && userInfo.cterInfo.length > 0) {
+                realTimeCterInfo = userInfo.cterInfo;
+
+                var selectSiteCdTmp = '';
+                var selectDongCdTmp = '';
+                var selectHoseCdTmp = '';
+                var selectSiteNmTmp = '';
+                var selectDongNmTmp = '';
+                var selectHoseNmTmp = '';
+                var selectHsngtpNmTmp = '';
+                var selectBrndCdTmp = '';
+                var selectSellKindCdTmp = '';
+
+                for (var i = 0; i < realTimeCterInfo.length; i++) {
+                  if (i == 0) { //선택 된 단지가 없을 경우를 위해
+                    selectSiteCdTmp = realTimeCterInfo[i].siteCd;
+                    selectDongCdTmp = realTimeCterInfo[i].dongCd;
+                    selectHoseCdTmp = realTimeCterInfo[i].hoseCd;
+                    selectSiteNmTmp = realTimeCterInfo[i].siteNm;
+                    selectDongNmTmp = realTimeCterInfo[i].dongNm;
+                    selectHoseNmTmp = realTimeCterInfo[i].hoseNm;
+                    selectHsngtpNmTmp = realTimeCterInfo[i].hsngtpNm;
+                    selectBrndCdTmp = realTimeCterInfo[i].prugioBrndClscd;
+                    selectSellKindCdTmp = realTimeCterInfo[i].sellKindCd;
+                  }
+                  var selectedTag = '';
+                  if (selectSiteCd == realTimeCterInfo[i].siteCd
+                    && selectDongNm == realTimeCterInfo[i].dongNm
+                    && selectHoseNm == realTimeCterInfo[i].hoseNm
+                  ) {
+                    selectedTag = 'selected';
+                    //선택단지로 지정
+                    selectSiteCdTmp = realTimeCterInfo[i].siteCd;
+                    selectDongCdTmp = realTimeCterInfo[i].dongCd;
+                    selectHoseCdTmp = realTimeCterInfo[i].hoseCd;
+                    selectSiteNmTmp = realTimeCterInfo[i].siteNm;
+                    selectDongNmTmp = realTimeCterInfo[i].dongNm;
+                    selectHoseNmTmp = realTimeCterInfo[i].hoseNm;
+                    selectHsngtpNmTmp = realTimeCterInfo[i].hsngtpNm;
+                    selectBrndCdTmp = realTimeCterInfo[i].prugioBrndClscd;
+                    selectSellKindCdTmp = realTimeCterInfo[i].sellKindCd;
+                  }
+
+                  htmlSelectBox += " <a "
+                  htmlSelectBox += " data-sitecd='" + realTimeCterInfo[i].siteCd + "'";
+                  htmlSelectBox += " data-dongnm='" + realTimeCterInfo[i].dongNm + "'";
+                  htmlSelectBox += " data-hosenm='" + realTimeCterInfo[i].hoseNm + "'";
+                  htmlSelectBox += " class=\"dropdown-item\">" + realTimeCterInfo[i].siteNm + " <span class=\"small\">" + realTimeCterInfo[i].dongNm + "동 " + realTimeCterInfo[i].hoseNm + "호</span>"
+                  htmlSelectBox += "<\/a> ";
+                  htmlSelectBox += "<script> ";
+                  htmlSelectBox += " $(\".dropdown-item\").click(function () { "
+                  htmlSelectBox += " 		chnSiteSeleted(this); "
+                  //htmlSelectBox += " 		$('.apt-info').html($(this).html());  "
+                  htmlSelectBox += " 		$(this).parent(\".dropdown-menu\").css(\"display\", \"none\");  "
+                  htmlSelectBox += " }); ";
+                  htmlSelectBox += "<\/script> ";
+                  /*
+                  htmlSelectBox += "<option ";
+                  htmlSelectBox += " data-sitecd='"+realTimeCterInfo[i].siteCd+"'";
+                  htmlSelectBox += " data-dongnm='"+realTimeCterInfo[i].dongNm+"'";
+                  htmlSelectBox += " data-hosenm='"+realTimeCterInfo[i].hoseNm+"'";
+                  htmlSelectBox += " value='"+realTimeCterInfo[i].siteCd+"'";
+                  htmlSelectBox += " "+selectedTag+" >";
+                  htmlSelectBox += realTimeCterInfo[i].siteNm+ " , "+ realTimeCterInfo[i].dongNm + "동 " + realTimeCterInfo[i].hoseNm + "호";
+                  htmlSelectBox += "</option>";
+                  */
+                }
+
+                //추가정보담기
+                setSessionStorage("selectSiteCd", selectSiteCdTmp);
+                setSessionStorage("selectDongNm", selectDongNmTmp);
+                setSessionStorage("selectHoseNm", selectHoseNmTmp);
+                setSessionStorage("selectSiteNm", selectSiteNmTmp);
+                setSessionStorage("selectDongCd", selectDongCdTmp);
+                setSessionStorage("selectHoseCd", selectHoseCdTmp);
+                setSessionStorage("selectHsngtpNm", selectHsngtpNmTmp);
+                setSessionStorage("selectBrndCd", selectBrndCdTmp);
+                setSessionStorage("userInfo", JSON.stringify(userInfo.userInfo));
+
+                if (!isAlertLunchNotice) { //웰컴밀(도시락) 안내 팝업이 노출되는 경우 담지 않음
+                  setSessionStorage("selectLunchSiteCd", selectSiteCdTmp);
+                  setSessionStorage("selectLunchDongNm", selectDongNmTmp);
+                  setSessionStorage("selectLunchHoseNm", selectHoseNmTmp);
+                  setSessionStorage("selectLunchBrndCd", selectBrndCdTmp);
+                }
+
+                /* 개행처리 하지 않음 - 2019.08.29
+                //if(selectSiteNmTmp.indexOf('푸르지오') != -1){
+                //	selectSiteNmTmp.replace('푸르지오','<br>푸르지오');
+                //}
+                $('#mainActionLabel').html(selectSiteNmTmp.replace('푸르지오','<br>푸르지오'));
+                */
+
+                $('#mainActionLabel').html(selectSiteNmTmp);
+                $('#mainActionSiteLabel').html(selectDongNmTmp + "동 " + selectHoseNmTmp + "호 ");
+                $('#mainActionSelectSite').html(htmlSelectBox);
+                $('#mainActionSelectSiteBtn').show();
+                $('.apt-info').addClass('fix').removeClass('full');
+
+                getMainChildHousAgrm(selectSiteCdTmp, selectDongCdTmp, selectHoseCdTmp);		//국공립어린이집 정보 조회
+                getMainSubfacltAgrm(selectSiteCdTmp, selectDongCdTmp, selectHoseCdTmp); 		//그리너리 라운지 조기오픈 정보 조회
+                getMainDeschgAgrm(selectSiteCdTmp, selectDongCdTmp, selectHoseCdTmp);   		//설계변경 정보 조회
+                getBannerInfo(selectSiteCdTmp);												//슬라이드 배너
+                if (["01", "02", "07", "09"].includes(selectSellKindCdTmp)) {
+                  getMainLunchChk(selectSiteCdTmp, selectDongCdTmp, selectHoseCdTmp);		//도시락서비스
+                }
+
+                getMainCareChildHousAgrm(selectSiteCdTmp, selectDongCdTmp, selectHoseCdTmp); 	//2022.10.10 다함께돌봄센터 조회
+
+                appendAjaxLoaing();
+                var params = '{"input":{ "siteCd":"' + selectSiteCdTmp.substring(0, 4) + '" }}';
+                ajaxParamExecute(params, baseUrl + "/pm/pmc01/pmc0101/getBfInsSiteBasInfo", "POST", function (data) {
+                  console.log(data);
+                  if (data != null && data.bfInsSiteBasInfo != null && data.bfInsSiteBasInfo.length != 0) {
+                    if (data.bfInsSiteBasInfo.downYn == 'Y' && data.bfInsSiteBasInfo.useYn == 'Y') {//신청가능
+                      $('.mainDefRcvBasMenuBody').show();
+                    } else {
+                      $('.mainDefRcvBasMenuBody').hide();
+                    }
+                  } else {
+                    $('.mainDefRcvBasMenuBody').hide();
+                  }
+                  removeAjaxLoaing();
+                });
+                /*
+                if(appCheck()) {//앱일 경우
+                  appendAjaxLoaing();
+
+                  callAppLocalDB("SELECT * FROM SITE_LIST WHERE SITE_CD LIKE '%"+selectSiteCdTmp.substring(0,4)+"%' ",null,function(status,result){
+                    if(status) {
+                      //console.log(result.rows.length);
+                      if(result.rows.length > 0) {
+                        var appLocalDBAsHouseInfo = result.rows;
+                        if(isRequestLock(appLocalDBAsHouseInfo.item(0).APPN_ST_DT,'before')) {
+                          //해당 단지는 아직 사전확인 접수기간이 아닙니다.
+                          $('.mainDefRcvBasMenuBody').hide();
+                        } else if(isRequestLock(appLocalDBAsHouseInfo.item(0).APPN_ED_DT,'after')) {
+                          //해당 단지는 사전확인 접수기간이 종료 되었습니다.
+                          $('.mainDefRcvBasMenuBody').hide();
+                        } else {
+                          //신청가능
+                          $('.mainDefRcvBasMenuBody').show();
+                        }
+                      } else {
+                        $('.mainDefRcvBasMenuBody').hide();
+                      }
+                    } else {
+                      $('.mainDefRcvBasMenuBody').hide();
+                    }
+                    removeAjaxLoaing();
+                  });
+                }
+                */
+
+              } else {//계약정보가 없는 고객
+                $('#mainActionLabel').html('안녕하세요.<br>오늘도 즐거운 하루 보내세요.');
+                $('#mainActionSelectSiteBtn').hide();
+                $('.apt-info').addClass('full').removeClass('fix');
+                getBannerInfo('');//슬라이드 배너
+              }
+
+              setMainInnerBoxMenuBatch();
+
+              //My단지 서비스 신청 버튼 노출 여부 검증
+              var siteSvcShowYn = data.siteSvcShowYn;
+              if (siteSvcShowYn != null && siteSvcShowYn == 'Y') { //show
+                $('.mainSiteSvcBody').show();
+              } else {//hide
+                $('.mainSiteSvcBody').hide();
+              }
+              //My단지 서비스 신청 버튼 노출 여부 검증
+
+              //사전확인 단지 정보 조회
+              if (localDefRcvBasInfoDataList != null) {
+                var bfInsSiteBasList = data.bfInsSiteBasList;
+                if (bfInsSiteBasList != null && bfInsSiteBasList.length > 0) {
+                  var isLock = true;
+                  var unregiCnt = 0;
+                  for (var i = 0; i < localDefRcvBasInfoDataList.length; i++) {
+                    var itemClient = localDefRcvBasInfoDataList.item(i);
+                    for (var j = 0; j < bfInsSiteBasList.length; j++) {
+                      var itemServer = bfInsSiteBasList[j];
+                      if (itemClient.SITE_CD == itemServer.siteCd) {
+                        if (!isRequestLock(itemServer.appnEdDt, 'after')) { //종료
+                          isLock = false;
+                          unregiCnt += 1;
+                        }
+                      }
+                    }
+                  }
+                  if (!isLock) {
+                    isExistUnregiList = true;
+                    unregiListCnt = unregiCnt;
+                  } else {
+                    isExistUnregiList = false;
+                    unregiListCnt = 0;
+                  }
+                } else {
+                  isExistUnregiList = false;
+                  unregiListCnt = 0;
+                }
+              } else {
+                isExistUnregiList = false;
+                unregiListCnt = 0;
+              }
+              //End of 사전확인 단지 정보 조회
+            });
+
+          } else { //비로그인
+            $('#mainActionLabel').html('안녕하세요.<br>로그인 후 이용해 주세요:)');
+            $('#mainActionSiteLabel').hide();
+            $('#mainActionSelectSiteBtn').hide();
+            $('.apt-info').addClass('full').removeClass('fix');
+
+            $('#mainChildHousAgrmBtn').hide();
+            $('#mainChildHousAgrmBtn').attr('onclick', "javascript:void(0)");
+
+            $('#mainLunchRequestBtn').hide();
+            $('#mainLunchRequestBtn').attr('onclick', "javascript:void(0)");
+
+            $('#mainSubfacltAgrmBtn').hide();
+            $('#mainSubfacltAgrmBtn').attr('onclick', "javascript:void(0)");
+
+            // 2022.10.10 ryu 다함께 돌봄센터 메뉴 추가
+            $('#mainCareChildHousAgrmBtn').hide();
+            $('#mainCareChildHousAgrmBtn').attr('onclick', "javascript:void(0)");
+
+            isMainChildHousAgrm = false;
+            isMainLunchRequest = false;
+            isMainSubfacltAgrm = false;
+            isMainCareChildHousAgrm = false; // 2022.10.10 다함께 돌봄
+
+            setMainInnerBoxMenuBatch();
+            //슬라이드 배너
+            getBannerInfo('');
+          }
+          updateUi();
+        }
+
+
+        function chnSiteSeleted(obj) {
+          /*//select 방식
+          var selected = $(obj).find('option:selected');
+          var data_sitecd = selected.attr('data-sitecd');
+          var data_dongnm = selected.attr('data-dongnm');
+          var data_hosenm = selected.attr('data-hosenm');
+          //if(data_sitecd && data_dongnm && data_hosenm) {
+          */
+          //div 방식
+          var data_sitecd = $(obj).attr('data-sitecd');
+          var data_dongnm = $(obj).attr('data-dongnm');
+          var data_hosenm = $(obj).attr('data-hosenm');
+          {
+            setSessionStorage("selectSiteCd", data_sitecd);
+            setSessionStorage("selectDongNm", data_dongnm);
+            setSessionStorage("selectHoseNm", data_hosenm);
+          }
+          location.reload();
+        }
+
+
+        //셀렉트 박스 자동열기
+        $(document).ready(function () {
+          //셀렉트 리스트 박스 자동 열기
+          (function ($) {
+            "use strict";
+            $.fn.openSelect = function () {
+              return this.each(function (idx, domEl) {
+                if (document.createEvent) {
+                  var event = document.createEvent("MouseEvents");
+                  event.initMouseEvent("mousedown", true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+                  domEl.dispatchEvent(event);
+                } else if (element.fireEvent) {
+                  domEl.fireEvent("onmousedown");
+                }
+              });
+            }
+          }(jQuery));
+          $("#mainActionSelectSiteBtn").on("click", function () {
+            $('#mainActionSelectSite').openSelect();
+          });
+          //
+        });
+
+        //국공립어린이집 메인에서 호출.
+        function getMainChildHousAgrm(siteCd, dongCd, hoseCd) {
+          console.log("=============국공립 메인호출1==============" + siteCd + "/" + dongCd + "/" + hoseCd);
+
+          removeSessionStorage("selectRegSeq");
+          removeSessionStorage("selectGdncFileAtchId");//안내파일
+          removeSessionStorage("selectAgrmFormFileAtchId");//동의양식
+          var params = '{"input":{"siteCd":"' + siteCd + '"'
+            + ', "dongCd":"' + dongCd + '"'
+            + ', "hoseCd":"' + hoseCd + '"'
+            + ', "userId":"' + getLocalStorage("j_username") + '"'
+            + ', "agrmClscd":"HOUSE"'
+            + '}}';
+          ajaxParamExecute(params, baseUrl + "/pm/common/none/mainChildHousAgrmWithAgrmItemYn", "POST", function (data) {
+
+            console.log("=============국공립 메인호출2==============" + JSON.stringify(data));
+
+            if (data != null && data.childInfo != null) {
+              if (data.childInfo.agrmYn == 'Y') {
+                $('#mainChildHousAgrmBtnLabelSpan').html('참여완료');
+                $('#mainChildHousAgrmBtnLabelSpan').show();
+                $('#mainChildHousAgrmBtnLabel').hide();
+              } else {
+                setSessionStorage("selectRegSeq", data.childInfo.regSeq);
+                setSessionStorage("selectGdncFileAtchId", data.childInfo.gdncFileAtchId);
+                setSessionStorage("selectAgrmFormFileAtchId", data.childInfo.agrmFormFileAtchId);
+                $('#mainChildHousAgrmBtnLabel').html('참여하기 <i class="material-icons"> arrow_forward_ios</i>');
+                $('#mainChildHousAgrmBtnLabel').show();
+                $('#mainChildHousAgrmBtnLabelSpan').hide();
+                $('#mainChildHousAgrmBtn').attr('onclick', "javascript:goMenu('/pm/pmg02/pmg0201/childHousAgrm', 'child')");
+              }
+              isMainChildHousAgrm = true;
+            } else {
+              $('#mainChildHousAgrmBtnLabel').html('해당없음..');
+              $('#mainChildHousAgrmBtn').hide();
+              isMainChildHousAgrm = false;
+            }
+            updateUi();
+          });//end ajax
+        }
+
+        // 2022.10.10 다함께 돌봄 메인에서 호출.
+        function getMainCareChildHousAgrm(siteCd, dongCd, hoseCd) {
+          removeSessionStorage("selectCareRegSeq");
+          removeSessionStorage("selectCareGdncFileAtchId");		//안내파일
+          removeSessionStorage("selectCareAgrmFormFileAtchId");	//동의양식
+
+          var params = '{"input":{"siteCd":"' + siteCd + '"'
+            + ', "dongCd":"' + dongCd + '"'
+            + ', "hoseCd":"' + hoseCd + '"'
+            + ', "userId":"' + getLocalStorage("j_username") + '"'
+            + ', "agrmClscd":"CARE"'
+            + '}}';
+          ajaxParamExecute(
+            params
+            , baseUrl + "/pm/common/none/mainCareChildHousAgrmWithAgrmItemYn", "POST"
+            , function (data) {
+              if (data != null && data.childInfo != null) {
+                if (data.childInfo.agrmYn == 'Y') {
+                  $('#mainCareChildHousAgrmBtnLabelSpan').html('참여완료');
+                  $('#mainCareChildHousAgrmBtnLabelSpan').show();
+                  $('#mainCareChildHousAgrmBtnLabel').hide();
+                } else {
+                  setSessionStorage("selectCareRegSeq", data.childInfo.regSeq);
+                  setSessionStorage("selectCareGdncFileAtchId", data.childInfo.gdncFileAtchId);  			// 동의 html 파일 Id
+                  setSessionStorage("selectCareAgrmFormFileAtchId", data.childInfo.agrmFormFileAtchId);	// 동의 양식 파일 Id
+                  $('#mainCareChildHousAgrmBtnLabel').html('참여하기 <i class="material-icons"> arrow_forward_ios</i>');
+                  $('#mainCareChildHousAgrmBtnLabel').show();
+                  $('#mainCareChildHousAgrmBtnLabelSpan').hide();
+                  $('#mainCareChildHousAgrmBtn').attr('onclick', "javascript:goMenu('/pm/pmg06/pmg0601/careChildHousAgrm', 'careChild')");
+                }
+                isMainCareChildHousAgrm = true; // 2022.10.10 다함께 돌봄
+              } else {
+                $('#mainCareChildHousAgrmBtnLabel').html('해당없음..');
+                $('#mainCareChildHousAgrmBtn').hide();
+                isMainCareChildHousAgrm = false; // 2022.10.10 다함께 돌봄
+              }
+              updateUi();
+            });//end ajax
+        }
+
+        // 그리너리 라운지 조기 오픈 메인에서 호출.
+        function getMainSubfacltAgrm(siteCd, dongCd, hoseCd) {
+          removeSessionStorage("selectSubfacltRegSeq");
+          removeSessionStorage("selectSubfacltGdncFileAtchId");//안내파일
+          var params = '{"input":{"siteCd":"' + siteCd + '"'
+            + ', "dongCd":"' + dongCd + '"'
+            + ', "hoseCd":"' + hoseCd + '"'
+            + ', "userId":"' + getLocalStorage("j_username") + '"'
+            + '}}';
+          ajaxParamExecute(params, baseUrl + "/pm/common/none/mainSubfacltAgrmWithAgrmItemYn", "POST", function (data) {
+            //console.log(data.subfacltInfo);
+            if (data != null && data.subfacltInfo != null) {
+              if (data.subfacltInfo.agrmYn == 'Y') {
+                $('#mainSubfacltAgrmBtnLabelSpan').html('참여완료');
+                $('#mainSubfacltAgrmBtnLabelSpan').show();
+                $('#mainSubfacltAgrmBtnLabel').hide();
+              } else {
+                setSessionStorage("selectSubfacltRegSeq", data.subfacltInfo.regSeq);
+                setSessionStorage("selectSubfacltGdncFileAtchId", data.subfacltInfo.gdncFileAtchId);
+                $('#mainSubfacltAgrmBtnLabel').html('참여하기 <i class="material-icons"> arrow_forward_ios</i>');
+                $('#mainSubfacltAgrmBtnLabel').show();
+                $('#mainSubfacltAgrmBtnLabelSpan').hide();
+                $('#mainSubfacltAgrmBtn').attr('onclick', "javascript:goMenu('/pm/pmg03/pmg0301/subfacltAgrm', 'child')");
+              }
+              isMainSubfacltAgrm = true;
+            } else {
+              $('#mainSubfacltAgrmBtnLabel').html('해당없음..');
+              $('#mainSubfacltAgrmBtn').hide();
+              isMainSubfacltAgrm = false;
+            }
+            updateUi();
+          });
+        }
+
+        // 설계변경 동의
+        function getMainDeschgAgrm(siteCd, dongCd, hoseCd) {
+          removeSessionStorage("selectDeschgRegSeq");
+          var params = '{"input":{"siteCd":"' + siteCd + '"'
+            + ', "dongCd":"' + dongCd + '"'
+            + ', "hoseCd":"' + hoseCd + '"'
+            + ', "userId":"' + getLocalStorage("j_username") + '"'
+            + '}}';
+          ajaxParamExecute(params, baseUrl + "/pm/common/none/mainDeschgWithAgrmItemYn", "POST", function (data) {
+            //console.log(data.deschgInfo);
+            if (data != null && data.deschgInfo != null) {
+              if (data.deschgInfo.agrmYn == 'Y') {
+                $('#mainDeschgAgrmBtnLabelSpan').html('참여완료');
+                $('#mainDeschgAgrmBtnLabelSpan').show();
+                $('#mainDeschgAgrmBtnLabel').hide();
+              } else {
+                setSessionStorage("selectDeschgRegSeq", data.deschgInfo.regSeq);
+                $('#mainDeschgAgrmBtnLabel').html('참여하기 <i class="material-icons"> arrow_forward_ios</i>');
+                $('#mainDeschgAgrmBtnLabel').show();
+                $('#mainDeschgAgrmBtnLabelSpan').hide();
+                $('#mainDeschgAgrmBtn').attr('onclick', "javascript:goMenu('/pm/pmg05/pmg0501/deschgAgrmItem', 'child')");
+              }
+              isMainDeschgAgrm = true;
+            } else {
+              $('#mainDeschgAgrmBtnLabel').html('해당없음..');
+              $('#mainDeschgAgrmBtn').hide();
+              isMainDeschgAgrm = false;
+            }
+            updateUi();
+          });//end ajax
+        }
+
+        //2019.08.13 도시락서비스 수정
+        function getMainLunchChk(siteCd, dongCd, hoseCd) {
+          //console.log(siteCd+"/"+dongCd+"/"+hoseCd);
+          var params = '{"input":{"siteCd":"' + siteCd + '" , "userId":"' + getLocalStorage("j_username") + '" }}';
+          ajaxParamExecute(params, baseUrl + "/pm/common/none/mainLunch", "POST", function (data) {
+            //console.log(data);
+            if (data == null || data.mainLunchList == null || data.mainLunchList.length == 0) {
+              $('#mainLunchRequestBtnLabel').html('해당없음..');
+              $('#mainLunchRequestBtn').hide();
+              isMainLunchRequest = false;
+            } else {
+              var date = new Date();
+              var year = date.getFullYear();
+              var month = (date.getMonth() + 1);
+              month = month >= 10 ? month : '0' + month;
+              var day = date.getDate();
+              day = day >= 10 ? day : '0' + day;
+
+              var offrYmd = year + '' + month + '' + day;
+              var params = '{"input":{"siteCd":"' + siteCd + '"'
+                + ', "dongCd":"' + dongCd + '"'
+                + ', "hoseCd":"' + hoseCd + '"'
+                + ', "offrYmd":"' + offrYmd + '"'
+                + ', "userId":"' + getLocalStorage("j_username") + '"'
+                + '}}';
+              ajaxParamExecute(params, baseUrl + "/pm/pmg01/pmg0101/getRequestCheck", "POST", function (rdata) {
+                //console.log(rdata);
+                if (rdata.offrYmdInfo.isReqUsed == 'Y') {
+                  if (rdata.cd == '1' || rdata.requestInfo != null) { //이미 등록됨
+                    $('#mainLunchRequestBtnLabelSpan').html('신청완료');
+                    $('#mainLunchRequestBtnLabelSpan').show();
+                    $('#mainLunchRequestBtnLabel').hide();
+                  } else {
+                    $('#mainLunchRequestBtnLabel').html('신청하기 <i class="material-icons"> arrow_forward_ios</i>');
+                    $('#mainLunchRequestBtnLabel').show();
+                    $('#mainLunchRequestBtnLabelSpan').hide();
+                  }
+                  isMainLunchRequest = true;
+                } else {
+                  $('#mainLunchRequestBtnLabelSpan').html('신청불가');
+                  $('#mainLunchRequestBtnLabelSpan').show();
+                  $('#mainLunchRequestBtnLabel').hide();
+                  isMainLunchRequest = false;
+                }
+                //신청여부에 상관없이 링크 이동 가능하도록 - 2019.08.28
+                $('#mainLunchRequestBtn').attr('onclick', "javascript:goMenu('/pm/pmg01/pmg0101/lunchRequest', 'lunch')");
+
+                updateUi();
+              });//end ajax
+            }//end
+          });//end ajax
+        }
+
+        //국공립어린이집,도시락(웰컴밀),그리너리라운지조기오픈동의 버튼 갱신
+        function updateUi() {
+          if (
+            !isMainChildHousAgrm &&
+            !isMainLunchRequest &&
+            !isMainSubfacltAgrm &&
+            !isMainDeschgAgrm &&
+            !isMainCareChildHousAgrm
+          ) $('.mainChildLunchBody').hide();
+          else $('.mainChildLunchBody').show();
+        }
+
+        //도시락 팝업용
+        function getMainLunch() {
+          var lunchLayer = getLocalStorage("lunchLayerYn");
+          var lunchLayerArg;
+          var lunchLayerYn = 'N';
+          var lunchLayerDate = '';
+
+          if (storageEmpty(lunchLayer)) {
+            lunchLayerArg = lunchLayer.split('/');
+            lunchLayerYn = lunchLayerArg[0];
+            lunchLayerDate = lunchLayerArg[1];
+          }
+
+          var nowDate = new Date();
+          var year = nowDate.getFullYear();
+          var month = (nowDate.getMonth() + 1);
+          month = month >= 10 ? month : '0' + month;
+          var day = nowDate.getDate();
+          day = day >= 10 ? day : '0' + day;
+          var nowDay = year + '' + month + '' + day;
+
+          if (lunchLayerYn != "Y" || nowDay != lunchLayerDate) {
+            var params = '{"input":{"userId":"' + getLocalStorage("j_username") + '"}}';
+
+            $.ajax({
+              url: baseUrl + "/pm/common/none/mainLunch",
+              type: "post",
+              data: params,
+              contentType: "application/json+sua",
+              success: function (data) {
+                returnMainLunchAjax(data);
+              },
+              error: function (request, status, error) {
+                console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+                removeAjaxLoaing();
+                if (request.status == "401") {
+                  sessionRetry();
+                }
+              },
+              beforeSend: function (xhr) {
+                xhr.setRequestHeader("AJAX", true);
+              },
+              complete: function () {
+              }
+            });
+          } else {
+            getExistUnregiListOpenLayer();//미등록내역레이어체크
+          }
+        }
+
+        function returnMainLunchAjax(data) {
+          if (data.mainLunchList != null && data.mainLunchList.length > 0) {
+            isAlertLunchNotice = true;
+            setSessionStorage("lunchInfo", JSON.stringify(data.mainLunchList));
+
+            var cterInfo = getSessionStorage("cterInfo");
+            var lunchSiteCng = 0;
+            var html = '';
+            var siteCd = "";
+
+            if (cterInfo != null) {
+              cterInfo = JSON.parse(cterInfo);
+              var isSelected = false;
+
+              for (var i = 0; i < cterInfo.length; i++) {
+                //console.log("i : " + i + ", value : " + JSON.stringify(cterInfo[i]));
+                for (var j = 0; j < data.mainLunchList.length; j++) {
+
+                  if (cterInfo[i].siteCd == data.mainLunchList[j].siteCd && ["01", "02", "07", "09"].includes(cterInfo[i].sellKindCd)) {
+                    var selected = '';
+                    if (!isSelected) {
+                      isSelected = true;
+                      selected = 'selected';
+                      siteCd = cterInfo[i].siteCd;
+
+                      setSessionStorage("selectLunchSiteCd", siteCd);
+                      setSessionStorage("selectLunchDongNm", cterInfo[i].dongNm);
+                      setSessionStorage("selectLunchHoseNm", cterInfo[i].hoseNm);
+                      setSessionStorage("selectLunchBrndCd", cterInfo[i].prugioBrndClscd);
+                    }
+
+                    html += '<option value="' + cterInfo[i].siteCd + ';' + cterInfo[i].dongNm + ';' + cterInfo[i].hoseNm + ';' + cterInfo[i].prugioBrndClscd + '" ' + selected + '>' + cterInfo[i].siteNm + ' ' + cterInfo[i].dongNm + '-' + cterInfo[i].hoseNm + '</option>\n';
+
+                    lunchSiteCng = lunchSiteCng + 1;
+                  }
+                }
+              }
+            }
+
+            if (lunchSiteCng > 0) {
+              $('#mainLunchSiteInfo').html(html);
+              if (lunchSiteCng == 1) $('#mainLunchSiteInfo').hide();
+              else $('#mainLunchSiteInfo').show();
+              lunchSiteSelect(siteCd);
+              // 				$('#mainLunchRequest').attr("href", baseUrl+"/pm/pmg01/pmg0101/lunchRequest");
+              $('#mainLunchLayer').click();
+
+              setTimeout("fn_mainLayerPosition()", 1000);
+            } else {
+              getExistUnregiListOpenLayer();//미등록내역레이어체크
+            }
+          } else {
+            getExistUnregiListOpenLayer();//미등록내역레이어체크
+          }
+        }
+
+
+
+        function fn_mainLayerPosition() {
+          var winH = $(window).height();
+          var winW = $(window).width();
+
+          var h = winH / 2 - $('#mainLunch').height() / 2;
+          if (h < 0) h = 0;
+
+          $('#mainLunch').css('top', h);
+        }
+
+        function lunchSiteSelect(siteCd) {
+          var lunchInfo = getSessionStorage("lunchInfo");
+
+          if (lunchInfo != null) {
+            lunchInfo = JSON.parse(lunchInfo);
+
+            for (var i = 0; i < lunchInfo.length; i++) {
+              if (siteCd == lunchInfo[i].siteCd) {
+                var cont = "";
+                if (lunchInfo[i].applClscd == "I") {
+                  cont = '<img src="' + baseUrl + '/co/common/file/download?fileAtchId=' + lunchInfo[i].atchFileId + '&fileId=' + lunchInfo[i].fileId + '">'
+                  $('#lunchCont01').html(cont)
+                  $('#lunchCont01').css("display", "block");
+                  $('#lunchCont02').css("display", "none");
+                } else {
+                  cont = lunchInfo[i].applCont;
+                  $('#lunchCont02').html(cont.split("&lt;br/&gt;").join("<br>"))
+                  $('#lunchCont01').css("display", "none");
+                  $('#lunchCont02').css("display", "block");
+                }
+              }
+            }
+          }
+        }
+
+        function mainLunchClose() {
+          setSessionStorage("selectLunchSiteCd", getSessionStorage('selectSiteCd'));
+          setSessionStorage("selectLunchDongNm", getSessionStorage('selectDongNm'));
+          setSessionStorage("selectLunchHoseNm", getSessionStorage('selectHoseNm'));
+          setSessionStorage("selectLunchBrndCd", getSessionStorage('selectBrndCd'));
+          if ($("input:checkbox[id='lunchTodayCheck']").is(":checked")) {
+            mainLunchTodayClose();
+          } else {
+            $('.window .close').click();
+            getExistUnregiListOpenLayer();//미등록내역레이어
+          }
+        }
+
+        function mainLunchTodayClose() {
+          var nowDate = new Date();
+          var year = nowDate.getFullYear();
+          var month = (nowDate.getMonth() + 1);
+          month = month >= 10 ? month : '0' + month;
+          var day = nowDate.getDate();
+          day = day >= 10 ? day : '0' + day;
+
+          setLocalStorage("lunchLayerYn", "Y/" + year + '' + month + '' + day);
+
+          $('.window .close').click();
+
+          getExistUnregiListOpenLayer();//미등록내역레이어
+        }
+
+        //---------------------------------------------------------
+        // 미등록내역 팝업 노출 처리 함수 - 2020.06.30
+        //---------------------------------------------------------
+        function getExistUnregiListOpenLayer() {
+          if (isExistUnregiList) {
+            var existUnregiListLayer = getLocalStorage("mainExistUnregiListLayerYn");
+            var existUnregiListLayerArg;
+            var existUnregiListLayerYn = 'N';
+            var existUnregiListLayerDate = '';
+
+            if (storageEmpty(existUnregiListLayer)) {
+              existUnregiListLayerArg = existUnregiListLayer.split('/');
+              existUnregiListLayerYn = existUnregiListLayerArg[0];
+              existUnregiListLayerDate = existUnregiListLayerArg[1];
+            }
+
+            var nowDate = new Date();
+            var year = nowDate.getFullYear();
+            var month = (nowDate.getMonth() + 1);
+            month = month >= 10 ? month : '0' + month;
+            var day = nowDate.getDate();
+            day = day >= 10 ? day : '0' + day;
+            var nowDay = year + '' + month + '' + day;
+
+            if (existUnregiListLayerYn != "Y" || nowDay != existUnregiListLayerDate) {
+              $('#labelUnregiListCnt').html(unregiListCnt);
+              $('#mainExistUnregiListLayer').click();
+            }
+          }
+        }
+
+        function mainExistUnregiListClose() {
+          if ($("input:checkbox[id='mainExistUnregiListTodayCheck']").is(":checked")) {
+            mainExistUnregiListTodayClose();
+          } else {
+            $('.window .close').click();
+          }
+        }
+
+        function mainExistUnregiListTodayClose() {
+          var nowDate = new Date();
+          var year = nowDate.getFullYear();
+          var month = (nowDate.getMonth() + 1);
+          month = month >= 10 ? month : '0' + month;
+          var day = nowDate.getDate();
+          day = day >= 10 ? day : '0' + day;
+
+          setLocalStorage("mainExistUnregiListLayerYn", "Y/" + year + '' + month + '' + day);
+
+          $('.window .close').click();
+        }
+        //---------------------------------------------------------
+
+        function getMainNotice() {
+          if (nextLayer == true) {
+            var params = '{"input":{"userId":"' + getLocalStorage("j_username") + '"}}';
+
+            $.ajax({
+              url: baseUrl + "/pm/common/none/mainNotice",
+              type: "post",
+              data: params,
+              contentType: "application/json+sua",
+              success: function (data) {
+                returnMainNoticeAjax(data);
+              },
+              error: function (request, status, error) {
+                //console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                removeAjaxLoaing();
+                if (request.status == "401") {
+                  sessionRetry();
+                }
+              },
+              beforeSend: function (xhr) {
+                xhr.setRequestHeader("AJAX", true);
+              },
+              complete: function () {
+              }
+            });
+          }
+        }
+
+        function returnMainNoticeAjax(data) {
+          var mainNoticeText = '';
+          if (data.mainNoticeInfo != null && data.mainNoticeInfo.cfYn == "N") {
+            mainNoticeText += data.mainNoticeInfo.title + '<br />';
+            mainNoticeText += data.mainNoticeInfo.cont;
+
+            $('#mainNoticeClose').attr("href", "javascript:mainNoticeClose()");
+            $('#mainNoticeTodayClose').attr("href", "javascript:mainNoticeTodayClose('" + data.mainNoticeInfo.notiSeq + "', '" + data.mainNoticeInfo.cfYn + "')");
+
+            $('#mainNoticeText').html(mainNoticeText.replace(/&lt;/g, "<").replace(/&gt;/g, ">"));
+            $('#mainNoticeLayer').click();
+          } else {
+            getMainLunch();
+          }
+        }
+
+        function mainNoticeClose() {
+          $('.window .close').click();
+          getMainLunch();
+        }
+
+        function mainNoticeTodayClose(notiSeq, cfYn) {
+          if (storageEmpty(getSessionStorage("userName"))) {
+            mainNoticeRead(notiSeq, cfYn);
+            $('.window .close').click();
+          } else {
+            $('.window .close').click();
+          }
+          getMainLunch();
+        }
+
+        function mainNoticeRead(notiSeq, cfYn) {
+          var userName = getSessionStorage("userName");
+          if (storageEmpty(userName) && cfYn == "N") {
+            var params = '{"input":{"userId":"' + getLocalStorage("j_username") + '", "notiSeq":"' + notiSeq + '"}}';
+            ajaxParamExecute(params, baseUrl + "/pm/pmf01/pmf0101/insertNoticeRead", "post");
+          }
+        }
+
+        // iframe resize
+        function autoResize(i) {
+          /*
+            var iframeHeight=
+            (i).contentWindow.document.body.scrollHeight;
+            (i).height=iframeHeight;
+             $('.mainBannerIfr').css("height", iframeHeight);
+          */
+        }
+
+        function mainTermLayerOpen() {
+          var params = '{"input":{"userId":"' + getLocalStorage("j_username") + '","trmClscd":"T"}}';
+          //console.log('params -->' + params);
+          ajaxParamExecute(params, baseUrl + "/pm/common/none/getTermResentInfo", "post", returnMainTermResentInfoAjax);
+        }
+
+        function returnMainTermResentInfoAjax(data) {
+          if (data.rstMap != null) $('#termHtml').html(data.rstMap.htmlCont.split("&#39;").join("'").split("&#92;&#106").join("\n").split("&quot;").join("\"").split("&lt;").join("<").split("&gt;").join(">").split("&#40;").join("(").split("&#41;").join(")")).trigger("create");
+          else $('#termHtml').html("");
+          $('#mainAgreeLayer1').click();
+        }
+
+        function mainPrivacyLayerOpen() {
+          var params = '{"input":{"userId":"' + getLocalStorage("j_username") + '","trmClscd":"P"}}';
+          ajaxParamExecute(params, baseUrl + "/pm/common/none/getTermResentInfo", "post", returnMainPrivacyResentInfoAjax);
+        }
+
+        function returnMainPrivacyResentInfoAjax(data) {
+          if (data.rstMap != null) $('#mainPrivacyHtml').html(data.rstMap.htmlCont.split("&#39;").join("'").split("&#92;&#106").join("\n").split("&quot;").join("\"").split("&lt;").join("<").split("&gt;").join(">").split("&#40;").join("(").split("&#41;").join(")")).trigger("create");
+          else $('#mainPrivacyHtml').html("");
+          $('#mainAgreeLayer2').click();
+        }
+
+        //슬라이드 배너 - 2019.08.29
+        function getBannerInfo(siteCd) {
+          $(".slider").html("");//배너초기화
+          var params = '{"input":{"siteCd":"' + siteCd + '"}}';
+          $.ajax({
+            url: baseUrl + "/pm/common/none/retrieveBanner",
+            type: "post",
+            data: params,
+            contentType: "application/json+sua",
+            success: function (data) {
+              returnBannerAjax(data);
+            },
+            error: function (request, status, error) {
+              console.log("code:" + request.status + "\n" + "message:" + request.responseText + "\n" + "error:" + error);
+            },
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader("AJAX", true);
+            },
+            complete: function () {
+            }
+          });
+        }
+
+        // 모바일 접속 여부 체크
+        function isMobile() {
+          return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
+        var isMakeMainSlickSlider = false;
+        function returnBannerAjax(data) {
+          //console.log("banner data : " + JSON.stringify(data));
+
+          if (isMakeMainSlickSlider) {
+            $('.slider').slick('slickRemove', null, null, true);
+            $(".slider").html('');
+            $(".slider").removeClass('slick-initialized slick-dotted');
+            isMakeMainSlickSlider = false;
+          }
+
+          var html = '';
+          if (getDevice() == "iOS") {
+            html = '<div class="slider-item"><a href="#" onclick="cordova.InAppBrowser.open(\'tel:' + ASTELNO + '\', \'_system\');" class="external" ><img src="../../../contents/pages/pm/resource/images/main/banner1.jpg" alt=""></a></div>';
+          } else {
+            html = '<div class="slider-item"><a href="TEL:' + ASTELNO + '"><img src="../../../contents/pages/pm/resource/images/main/banner1.jpg" alt=""></a></div>';
+            if (!isMobile()) {
+              // $(".google_div").css("display", "");
+            }
+          }
+
+          if (data.bannerInfo != null) {
+            for (var i = 0; i < data.bannerInfo.length; i++) {
+              var innerHtml = '';
+              var href = '#';
+              if (data.bannerInfo[i].linkApplYn == "Y") href = data.bannerInfo[i].urlPath;
+
+              if (data.bannerInfo[i].wholeApplYn == "N") {
+                if (appCheck()) {
+                  innerHtml = '<div class="slider-item"><a href="#" onclick="cordova.InAppBrowser.open(\'' + href + '\', \'_blank\', \'location=no\');" class="external"><img src="' + baseUrl + '/co/common/file/download?fileAtchId=' + data.bannerInfo[i].atchFileId + '&fileId=' + data.bannerInfo[i].fileId + '" alt="' + data.bannerInfo[i].banrTitle + '"></a></div>\n';
+                }
+              } else {
+                if (getDevice() == "iOS") {
+                  innerHtml = '<div class="slider-item"><a href="#" onclick="cordova.InAppBrowser.open(\'' + href + '\', \'_system\');" class="external"><img src="' + baseUrl + '/co/common/file/download?fileAtchId=' + data.bannerInfo[i].atchFileId + '&fileId=' + data.bannerInfo[i].fileId + '" alt="' + data.bannerInfo[i].banrTitle + '"></a></div>\n';
+                } else {
+                  innerHtml = '<div class="slider-item"><a href="' + href + '" target="_blank"><img src="' + baseUrl + '/co/common/file/download?fileAtchId=' + data.bannerInfo[i].atchFileId + '&fileId=' + data.bannerInfo[i].fileId + '" alt="' + data.bannerInfo[i].banrTitle + '"></a></div>\n';
+                }
+              }
+
+              html += innerHtml;
+              //if(isMakeMainSlickSlider) {
+              //	$(".slider").slick('slickAdd',innerHtml);
+              //}
+            }
+          }
+
+          if (!isMakeMainSlickSlider && html != '') {
+            $(".slider").html(html);
+            $('.slider').slick({
+              autoplay: true,
+              autoplaySpeed: 5000,
+              slidesToShow: 1,
+              slidesToScroll: 1,
+              centerMode: true,
+              arrows: false,
+              variableWidth: true,
+            });
+            isMakeMainSlickSlider = true;
+          }
+        }
+
+        function isRequestLock(x, t) {
+          if (t == null) t = '';
+          var rst = false;
+          var now = new Date();
+          var now_zero = new Date(now.getFullYear() + '-' + (now.getMonth() + 1) + '-' + now.getDate() + ' 00:00:00');
+          var val = new Date(x);
+          if (now_zero < val) {//미래
+            if (t == 'before') rst = true;
+            else if (t == 'after') rst = false;
+            else rst = false;
+          } else if (now_zero > val) {//과거
+            if (t == 'before') rst = false;
+            else if (t == 'after') rst = true;
+            else rst = true;
+          } else {//현재
+            if (t == 'before') rst = false;
+            else if (t == 'after') rst = false;
+            else rst = true;
+          }
+          //console.log('rst : '+rst+' , x : '+x+' , t : '+t+' , 현재 : '+now_zero.getFullYear()+'-'+(now_zero.getMonth()+1)+'-'+now_zero.getDate()+' '+now_zero.getHours()+':'+now_zero.getMinutes()+':'+now_zero.getSeconds()+' , 비교 : '+val.getFullYear()+'-'+(val.getMonth()+1)+'-'+val.getDate()+' '+val.getHours()+':'+val.getMinutes()+':'+val.getSeconds());
+          return rst;
+        }
+
+        function fn_goInstall() {
+          if (getDevice() == "iOS") {
+            window.open(IOS_MARKETURL, '_blank');
+          } else {
+            window.open(ANDROID_MARKETURL, '_blank');
+          }
+        }
+
+      </script>
+      <!-- 20190826 추가:아파트선택 풀다운-->
+      <script type="text/javascript">
+        $(document).ready(function () {
+          $(".dropdown-toggle").click(function () {
+            event.stopPropagation();
+            var _display = $(this).next(".dropdown-menu").css('display');
+            if (_display == 'block') {
+              $('.dropdown-menu').hide();
+            } else {
+              $(this).next(".dropdown-menu").css("display", "block");
+            }
+          });
+          $(document).click(function () {
+            $('.dropdown-menu').hide();
+          });
+          /*
+          $(".dropdown-item").click(function () {
+            chnSiteSeleted(this);
+              $('.apt-info').html($(this).html());
+              $(this).parent(".dropdown-menu").css("display", "none");
+          });
+          */
+        });
+
+      </script>
+      <!-- //20190826 추가:아파트선택 풀다운-->
+      <nav class="navDiv" id="allmenu">
+        <div class="bg" style="display: none;"></div>
+        <button type="button" id="btn_close_allmenu"><i class="material-icons">close</i></button>
+        <div class="allin">
+          <div class="login_t">
+            <div class="user_img"><img src="../../../contents/pages/pm/resource/images/main/logo_mark.png"></div>
+            <div class="user_text"><em>류도영 님</em>,<br>즐거운 하루 보내세요 !</div>
+          </div>
+          <div class="icon_out"><a onclick="fn_logout('https://app.prugiocs.com/j_spring_security_checkout')">로그아웃</a></div>
+          <div class="qu_mymenu">
+            <div onclick="goMenu('/pm/pmb01/pmb0101/main', 'PMCS001')" class="home"><i class="material-icons-outlined">home</i>
+              <div class="text">홈</div>
+            </div>
+            <div onclick="goMenu('/pm/pmf01/pmf0101/myMenu', 'PMCS046')" class="my"><i class="material-icons">person_outline</i>
+              <div class="text">마이메뉴</div>
+            </div>
+            <div onclick="goMenu('/pm/pmf01/pmf0101/setting', 'PMCS038')" class="setting"><i class="material-icons-outlined">settings</i>
+              <div class="text">설정</div>
+            </div>
+          </div>
+          <div id="gnb">
+            <div class="gnb-tab-wrapper">
+              <ul class="tabs-nav">
+                <li class="tab-link on" data-tab="tab1">사전확인</li>
+                <li class="tab-link " data-tab="tab2">AS 접수</li>
+                <li class="tab-link " data-tab="tab3">납부안내</li>
+                <li class="tab-link " data-tab="tab4">입주안내</li>
+                <li class="tab-link " data-tab="tab5">분양안내</li>
+                <li class="tab-link " data-tab="tab6">서류신청/안내</li>
+                <li class="tab-link " data-tab="tab7">환경설정</li>
+              </ul>
+              <div class="gnb-banner">
+                <a href="#" class="clk-merge-app-link"><img src="../../../contents/pages/pm/resource/images/re_main/icon_app.png"></a>푸르지오<br>스마트홈
+              </div>
+            </div>
+            <div class="gnb-tab-content-wrap">
+              <div id="tab1" class="tab-content on">
+                <div class="qu_t1">사전확인</div>
+                <div class="qu_t2"><a href="javascript:goMenuOffline('/pm/pmc01/pmc0101/requestPre')">
+                    <p>사전확인 신청</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmc01/pmc0101/preList', 'PMCS050')">
+                    <p>사전확인 접수내역</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenuOffline('/pm/pmc01/pmc0101/unregiList')">
+                    <p>사전확인 미등록내역</p><i class="material-icons"></i>
+                  </a></div>
+              </div>
+              <div id="tab2" class="tab-content ">
+                <div class="qu_t1">AS 접수</div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmc01/pmc0101/requestAS', 'PMCS007')">
+                    <p>AS 신청</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmc01/pmc0101/asList', 'PMCS008')">
+                    <p>AS 접수내역</p><i class="material-icons"></i>
+                  </a></div>
+              </div>
+              <div id="tab3" class="tab-content ">
+                <div class="qu_t1">납부안내</div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmd01/pmd0101/allotment', 'PMCS010')">
+                    <p>분양금 조회</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmd01/pmd0101/calculation', 'PMCS011')">
+                    <p>선납/연체금 계산</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmd01/pmd0101/account', 'PMCS012')">
+                    <p>가상계좌안내</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmd01/pmd0101/payment', 'PMCS013')">
+                    <p>납부확인서 발급</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmd01/pmd0101/allotmentGuide', 'PMCS014')">
+                    <p>분양금 납부 가이드</p><i class="material-icons"></i>
+                  </a></div>
+              </div>
+              <div id="tab4" class="tab-content ">
+                <div class="qu_t1">입주안내</div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pme01/pme0101/dwellInfo', 'PMCS019')">
+                    <p>입주안내</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pme01/pme0101/visitHomeAgree', 'PMCS020')">
+                    <p>내집방문예약</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pme01/pme0101/moveInAgree', 'PMCS023')">
+                    <p>입주예약</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pme01/pme0101/moveInGuide', 'PMCS026')">
+                    <p>입주 가이드</p><i class="material-icons"></i>
+                  </a></div>
+              </div>
+              <div id="tab5" class="tab-content ">
+                <div class="qu_t1">분양안내</div>
+                <div class="qu_t2"><a href="http://m.prugio.com/sale/sale.aspx?menu=0" target="_blank">
+                    <p>분양안내</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="http://m.prugio.com/sale/plan.aspx" target="_blank">
+                    <p>분양계획</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmh01/pmh0101/visitSiteSelect', 'PMCS053')">
+                    <p>견본주택 방문예약 </p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmh03/pmh0301/ctVisitSiteSelect', 'PMCS055')">
+                    <p>서류접수 및 계약일 예약</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmh02/pmh0201/optionSiteSelect', 'PMCS054')">
+                    <p>옵션신청예약</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmh04/pmh0401/reVisitSiteSelect', 'PMCS056')">
+                    <p>전매방문예약</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmh05/pmh0501/moVisitSiteSelect', 'PMCS057')">
+                    <p>대출자서방문예약</p><i class="material-icons"></i>
+                  </a></div>
+              </div>
+              <div id="tab6" class="tab-content ">
+                <div class="qu_t1">서류신청/안내</div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmf01/pmf0101/requestPapers', 'PMCS033')">
+                    <p>서류신청/발급</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmf01/pmf0101/notice', 'PMCS037')">
+                    <p>공지사항</p><i class="material-icons"></i>
+                  </a></div>
+              </div>
+              <div id="tab7" class="tab-content ">
+                <div class="qu_t1">환경설정</div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmf01/pmf0101/asHouse', 'PMCS039')">
+                    <p>My단지 관리</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmf01/pmf0101/myMenuMng', 'PMCS041')">
+                    <p>마이메뉴관리</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmf01/pmf0101/alarmSetting', 'PMCS042')">
+                    <p>알림 설정</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmf01/pmf0101/personModify', 'PMCS043')">
+                    <p>개인정보변경</p><i class="material-icons"></i>
+                  </a></div>
+                <div class="qu_t2"><a href="javascript:goMenu('/pm/pmf01/pmf0101/application', 'PMCS044')">
+                    <p>어플리케이션 정보</p><i class="material-icons"></i>
+                  </a></div>
+              </div>
+            </div>
+            <div class="qu_copy">Copyright app.prugiocs.com All rights reserved.</div>
+          </div>
+        </div>
+      </nav>
+      <script>$(document).ready(function () { $('.gnb-tab-wrapper ul.tabs-nav li').on("click", (function () { var tab_id = $(this).attr('data-tab'); $('.gnb-tab-wrapper  ul.tabs-nav li').removeClass('on'); $('.gnb-tab-content-wrap  .tab-content').removeClass('on'); $(this).addClass('on'); $('.gnb-tab-content-wrap  #' + tab_id).addClass('on'); })); $('.clk-merge-app-link').on("click", (function () { document.location.href = "applink://catch?s=pips-mobile&p=com.daewooenc.pips.android"; })); });</script>
+      <div class="header">
+        <!-- 상단고정-->
+        <div id="main_header">
+          <div class="logo">푸르지오 모바일 상담 </div>
+          <div class="notice_icon">
+            <a href="javascript:void(0)" class="btn" onclick="goMenu('/pm/pmf01/pmf0101/alarm', 'PMCS045')"> </a>
+            <div class="new_icon" style="display:none;"></div>
+          </div>
+          <div class="allmenu_icon">
+            <a href="#allmenu" id="btn_allmenu">
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+    <section class="contents"><!--본문 -->
+      <div class="header-wall">
+        <div class="apt-info fix"><span id="mainActionLabel">테스트 푸르지오</span><small id="mainActionSiteLabel">301동 1501호 </small></div>
+        <!--
+          <button class="apt-select" id="mainActionSelectSiteBtn" style="display:none;">
+              <img src="../../../contents/pages/pm/resource/images/re_main/icon_apt.png">
+          </button>
+          <select id="mainActionSelectSite" onchange="chnSiteSeleted(this)" style="width:0px;height:0px;visibility:hidden;"></select>
+          -->
+        <div class="div-dropdown apt-select" id="mainActionSelectSiteBtn" style="">
+          <button type="" class="dropdown-toggle">
+            <img src="../../../contents/pages/pm/resource/images/re_main/icon_apt.png">
+          </button>
+          <div class="dropdown-menu" id="mainActionSelectSite" style="display: none;"> <a data-sitecd="KVFA1" data-dongnm="301" data-hosenm="1501" class="dropdown-item">테스트 푸르지오 <span class="small">301동 1501호</span></a>
+            <script>  $(".dropdown-item").click(function () { chnSiteSeleted(this); $(this).parent(".dropdown-menu").css("display", "none"); }); </script>
+          </div>
+        </div>
+
+
+      </div>
+      <div class="inner-box">
+        <div class="inner">
+          <h2 class="mainDefRcvBasMenuBody" style="display:none;">사전 확인 </h2>
+          <ul class="c-menu-list mainDefRcvBasMenuBody" style="display:none;">
+            <li> <a href="javascript:goMenu('/pm/pmf01/pmf0101/asHouse', 'PMCS039')" class="btn">
+                <div class="remain_icon icon8"></div>
+                <div class="text">My단지<br>관리</div>
+              </a> </li>
+            <li> <a href="javascript:goMenuOffline('/pm/pmc01/pmc0101/requestPre')" class="btn">
+                <div class="remain_icon icon1"></div>
+                <div class="text">사전확인<br>신청</div>
+              </a> </li>
+            <li> <a href="javascript:goMenu('/pm/pmc01/pmc0101/preList', 'PMCS050')" class="btn">
+                <div class="remain_icon icon2"></div>
+                <div class="text">사전확인<br>접수내역</div>
+              </a> </li>
+          </ul>
+          <h2>납부 안내 <a href="javascript:goMenu('/pm/pmd01/pmd0101/allotmentGuide', 'PMCS014')" class="floatR">분양금 납부 가이드 <i class="material-icons"> arrow_forward_ios</i></a></h2>
+          <ul class="c-menu-list">
+            <li> <a href="javascript:goMenu('/pm/pmd01/pmd0101/allotment', 'PMCS010')" class="btn">
+                <div class="remain_icon icon3"></div>
+                <div class="text">분양금<br>조회</div>
+              </a> </li>
+            <li> <a href="javascript:goMenu('/pm/pmd01/pmd0101/calculation', 'PMCS011')" class="btn">
+                <div class="remain_icon icon4"></div>
+                <div class="text">선납/연체금<br>계산</div>
+              </a> </li>
+            <li> <a href="javascript:goMenu('/pm/pmd01/pmd0101/account', 'PMCS012')" class="btn">
+                <div class="remain_icon icon5"></div>
+                <div class="text">가상계좌<br>안내</div>
+              </a> </li>
+          </ul>
+          <h2>입주 안내 <a href="javascript:goMenu('/pm/pme01/pme0101/moveInGuide', 'PMCS026')" class="floatR">입주가이드 <i class="material-icons"> arrow_forward_ios</i></a></h2>
+          <ul class="c-menu-list">
+            <li> <a href="javascript:goMenu('/pm/pme01/pme0101/dwellInfo', 'PMCS019')" class="btn">
+                <div class="remain_icon icon6"></div>
+                <div class="text">입주안내</div>
+              </a> </li>
+            <li> <a href="javascript:goMenu('/pm/pme01/pme0101/visitHomeAgree', 'PMCS020')" class="btn">
+                <div class="remain_icon icon7"></div>
+                <div class="text">내집방문예약</div>
+              </a> </li>
+            <li> <a href="javascript:goMenu('/pm/pme01/pme0101/moveInAgree', 'PMCS023')" class="btn">
+                <div class="remain_icon icon8"></div>
+                <div class="text">입주예약</div>
+              </a> </li>
+          </ul>
+          <h2>서류신청/발급 </h2>
+          <ul class="c-menu-list col-2">
+            <li> <a href="javascript:goMenu('/pm/pmd01/pmd0101/payment', 'PMCS013')" class="btn">
+                <div class="remain_icon icon9"></div>
+                <div class="text">분양금납부<br>확인서</div>
+              </a> </li>
+            <li> <a href="javascript:pageMove('/pm/pmf01/pmf0101/requestMoveInPapers')" class="btn">
+                <div class="remain_icon icon10"></div>
+                <div class="text">입주예정<br>확인서</div>
+              </a> </li>
+          </ul>
+          <h2></h2>
+          <ul class="c-menu-block mainSiteSvcBody" style="display:none;">
+            <li>
+              <div class="btn">
+                <div class="remain_icon icon11"></div>
+                <div class="text">My단지 서비스 신청</div> <a href="javascript:goMenu('/pm/pmg04/pmg0401/siteSvcList', 'PMCS023')" class="floatR">참여하기 <i class="material-icons"> arrow_forward_ios</i></a>
+              </div>
+            </li>
+          </ul>
+          <div class="icon-chatbot" style="margin-bottom:10%"> <a href="https://api.happytalk.io/api/kakao/chat_open?yid=%40%EB%8C%80%EC%9A%B0%EA%B1%B4%EC%84%A4%ED%91%B8%EB%A5%B4%EC%A7%80%EC%98%A4&amp;site_id=5000001030&amp;category_id=121225&amp;division_id=121226&amp;id=dyryu77" target="_blank"><img src="https://happytalk.io/assets/main/img/btn-chat-kakao.png"></a></div>
+          <h2 class="mainChildLunchBody" style="">동의 및 신청 현황 </h2>
+          <ul class="c-menu-block mainChildLunchBody" style="">
+            <li id="mainChildHousAgrmBtn" style="display: none;">
+              <div class="btn">
+                <div class="remain_icon icon12"></div>
+                <div class="text">국공립어린이집 동의</div> <a class="floatR" id="mainChildHousAgrmBtnLabel" style="display:none;">해당없음..</a> <span class="floatR" id="mainChildHousAgrmBtnLabelSpan" style="display:none;">신청완료</span>
+              </div>
+            </li>
+            <li id="mainCareChildHousAgrmBtn" style="display: none;">
+              <div class="btn">
+                <div class="remain_icon icon12"></div>
+                <div class="text">다함께돌봄센터 설치 동의</div> <a class="floatR" id="mainCareChildHousAgrmBtnLabel" style="display:none;">해당없음..</a> <span class="floatR" id="mainCareChildHousAgrmBtnLabelSpan" style="display:none;">신청완료</span>
+              </div>
+            </li>
+            <li id="mainLunchRequestBtn" style="display: none;">
+              <div class="btn">
+                <div class="remain_icon icon13"></div>
+                <div class="text">웰컴밀 신청</div> <a class="floatR" id="mainLunchRequestBtnLabel" style="display:none;">해당없음..</a> <span class="floatR" id="mainLunchRequestBtnLabelSpan" style="display:none;">신청완료</span>
+              </div>
+            </li>
+            <li id="mainSubfacltAgrmBtn" style="display: none;">
+              <div class="btn">
+                <div class="remain_icon icon14"></div>
+                <div class="text">그리너리 라운지 조기 오픈</div> <a class="floatR" id="mainSubfacltAgrmBtnLabel" style="display:none;">해당없음..</a> <span class="floatR" id="mainSubfacltAgrmBtnLabelSpan" style="display:none;">신청완료</span>
+              </div>
+            </li>
+            <li id="mainDeschgAgrmBtn" onclick="javascript:goMenu('/pm/pmg05/pmg0501/deschgAgrmItem', 'child')">
+              <div class="btn">
+                <div class="remain_icon icon15"></div>
+                <div class="text">설계변경동의</div> <a class="floatR" id="mainDeschgAgrmBtnLabel" style="">참여하기 <i class="material-icons"> arrow_forward_ios</i></a> <span class="floatR" id="mainDeschgAgrmBtnLabelSpan" style="display:none;">신청완료</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <!-- new 슬라이더 시작 -->
+        <!--
+             <iframe id="mainBannerIfr" width="100%" height="80vh" src="../../../pm/pmb01/pmb0101/mainBannerSlide.html" scrolling="no" frameborder="0" onload="autoResize(this)" style="margin-bottom:10px;"></iframe>
+             -->
+        <section id="main-banner">
+          <div class="slider slick-initialized slick-slider">
+            <div class="slick-list draggable" style="padding: 0px 50px;">
+              <div class="slick-track" style="opacity: 1; width: 10000px; transform: translate3d(-947px, 0px, 0px);">
+                <div class="slick-slide slick-cloned" data-slick-index="-2" aria-hidden="true" tabindex="-1">
+                  <div>
+                    <div class="slider-item" style="width: 100%; display: inline-block;"><a href="TEL:1670-1000" tabindex="-1"><img src="../../../contents/pages/pm/resource/images/main/banner1.jpg" alt=""></a></div>
+                  </div>
+                </div>
+                <div class="slick-slide slick-cloned slick-center" data-slick-index="-1" aria-hidden="true" tabindex="-1">
+                  <div>
+                    <div class="slider-item" style="width: 100%; display: inline-block;"><a href="https://app.prugiocs.com/pm/pmf01/pmf0101/notice" target="_blank" tabindex="-1"><img src="https://app.prugiocs.com/co/common/file/download?fileAtchId=1002304634&amp;fileId=3" alt="구글 스토어 앱 서비스 수리중"></a></div>
+                  </div>
+                </div>
+                <div class="slick-slide" data-slick-index="0" aria-hidden="true" tabindex="-1">
+                  <div>
+                    <div class="slider-item" style="width: 100%; display: inline-block;"><a href="TEL:1670-1000" tabindex="-1"><img src="../../../contents/pages/pm/resource/images/main/banner1.jpg" alt=""></a></div>
+                  </div>
+                </div>
+                <div class="slick-slide slick-current slick-active slick-center" data-slick-index="1" aria-hidden="false">
+                  <div>
+                    <div class="slider-item" style="width: 100%; display: inline-block;"><a href="https://app.prugiocs.com/pm/pmf01/pmf0101/notice" target="_blank" tabindex="0"><img src="https://app.prugiocs.com/co/common/file/download?fileAtchId=1002304634&amp;fileId=3" alt="구글 스토어 앱 서비스 수리중"></a></div>
+                  </div>
+                </div>
+                <div class="slick-slide slick-cloned" data-slick-index="2" aria-hidden="true" tabindex="-1">
+                  <div>
+                    <div class="slider-item" style="width: 100%; display: inline-block;"><a href="TEL:1670-1000" tabindex="-1"><img src="../../../contents/pages/pm/resource/images/main/banner1.jpg" alt=""></a></div>
+                  </div>
+                </div>
+                <div class="slick-slide slick-cloned" data-slick-index="3" aria-hidden="true" tabindex="-1">
+                  <div>
+                    <div class="slider-item" style="width: 100%; display: inline-block;"><a href="https://app.prugiocs.com/pm/pmf01/pmf0101/notice" target="_blank" tabindex="-1"><img src="https://app.prugiocs.com/co/common/file/download?fileAtchId=1002304634&amp;fileId=3" alt="구글 스토어 앱 서비스 수리중"></a></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!--
+                 <div style="text-align:center;display:none" class="google_div">
+                   <a href="javascript:;" onclick="fn_file_google();">
+                     <img src="../../../contents/pages/pm/resource/images/google_download.png" alt="" style="width:305px;">
+                   </a>
+                 </div>
+                 -->
+        </section>
+        <!--  슬라이더  끝 -->
+
+      </div>
+
+      <script>
+        // 파일 다운로드
+        function fn_file_google() {
+          var url = "http://app.prugiocs.com/co/common/file/download?fileAtchId=1002247810";
+          let iFrame = $('#hiddenFrame');
+          if (iFrame.length == 0) {
+            $('<iframe name="hiddenFrame" id="hiddenFrame" style="visibility: hidden;position: absolute; left: 0; top: 0; height:0; width:0; border: none;"></iframe>').appendTo('body');
+            iFrame = $('#hiddenFrame');
+          }
+          let iFrameParent = iFrame.parent();
+          iFrame.remove();
+          iFrame.attr('src', url);
+          iFrameParent.append(iFrame);
+        }
+      </script>
+
+      <footer>
+        <div class="inner_footer">
+          <ul class="m-footer-link">
+            <li><a href="javascript:mainTermLayerOpen();" class="btn">이용약관</a></li>
+            <li><a href="javascript:mainPrivacyLayerOpen();" class="btn">개인정보처리방침</a></li>
+          </ul>
+          <p>
+            법인명 : (주)대우건설 서울특별시 중구 을지로 170(을지로4가)<br>
+            사업자 등록번호 : 104-81-58180<br>
+            Copyright app.prugiocs.com All rights reserved.
+          </p>
+        </div>
+      </footer>
+
+    </section>
+  </div>
+</body>
+
+</html>

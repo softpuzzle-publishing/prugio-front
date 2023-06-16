@@ -42,12 +42,6 @@
   flex-grow: 1;
 }
 
-/* jquery mobile page 애니메이션 삭제 (ios 이슈) */
-.ui-page {
-  -webkit-animation-duration: 0ms !important;
-  -moz-animation-duration: 0ms !important;
-}
-
 .new-pre-nav {
   display: flex;
   align-items: center;
@@ -834,4 +828,44 @@ textarea.new-pre-form-control:focus {
   height: 50px;
   border-radius: 50rem;
   margin-top: 40px;
+}
+
+/* jquery mobile page 애니메이션 삭제 (ios 이슈) */
+.ui-page {
+  -webkit-animation-duration: 0ms !important;
+  -moz-animation-duration: 0ms !important;
+}
+
+.remain .contents .c-menu-list.col-1 li {
+  width: 100%;
+}
+.remain .contents .c-menu-list.col-1 li .btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 60px;
+  padding-left: 17px;
+  padding-right: 17px;
+}
+.remain .contents .c-menu-list.col-1 li .btn > div {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.remain .contents .c-menu-list.col-1 li .btn .text {
+  padding-top: 0;
+}
+.remain .contents .c-menu-list.col-1 li .btn small {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #9da4aa;
+  font-size: 12px;
+}
+.remain .contents .c-menu-list.col-1 li .btn small::after {
+  content: "";
+  display: block;
+  background: url("data:image/svg+xml,%3Csvg width='14' height='14' viewBox='0 0 14 14' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M5.25 2.91602L9.33333 6.99935L5.25 11.0827' stroke='%239DA4AA' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E%0A") no-repeat 0 0;
+  width: 14px;
+  height: 14px;
 }/*# sourceMappingURL=new-pre.css.map */
