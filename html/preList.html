@@ -38,6 +38,7 @@
   <link href="https://app.prugiocs.com/contents/pages/pm/resource/css/slick.css?_=20200521" rel="stylesheet">
   <script src="https://app.prugiocs.com/contents/pages/pm/resource/lib/slick.min.js" charset="utf-8"></script>
 
+
   <link rel="stylesheet" href="../resource/css/new-pre.css">
   <script src="../resource/js/new-pre.js" defer></script>
 </head>
@@ -231,10 +232,76 @@
       </div>
     </div>
   </div>
+  <div class="new-pre-modal new-pre-modal-fullscreen" id="modal-photo">
+    <div class="dim active" data-close="modal"></div>
+    <div class="new-pre-modal-content">
+      <button type="button" class="btn-close-corner" aria-label="Close" data-close="modal"></button>
+      <div class="new-pre-modal-body">
+        <div class="title pager"></div>
+        <div class="photo-wrapper">
+          <div class="slider">
+            <div class="item">
+              <img src="../resource/images/@landscape.jpg" alt="">
+            </div>
+            <div class="item">
+              <img src="../resource/images/@portrait.jpg" alt="">
+            </div>
+          </div>
+        </div>
+        <div class="photo-delete">
+          <button type="button" class="btn-photo-delete" aria-label="사진 삭제"></button>
+        </div>
+      </div>
+    </div>
+  </div>
   <script>
     $(document).ready(function () {
       $("#c-footer").remove();
       $('.ui-page').removeClass('has-c-footer');
+
+      /* 사진확대보기 모달 slider */
+      var $slickElement;
+      function photoSlider(status) {
+        console.log(status);
+        if (status == 'destroy') {
+          $slickElement.slick('unslick');
+        } else {
+          var $status = $('.pager');
+          $slickElement = $('.photo-wrapper .slider');
+
+          $slickElement.on('init reInit afterChange', function (event, slick, currentSlide, nextSlide) {
+            var i = (currentSlide ? currentSlide : 0) + 1;
+            $status.text(i + '/' + slick.slideCount);
+          });
+
+          $slickElement.slick({
+            prevArrow: false,
+            nextArrow: false,
+            dots: false
+          });
+        }
+      }
+
+      /* 사진확대보기 모달 열기 */
+      $(".new-pre-list .photos img").on("click", function () {
+        $("#modal-photo").addClass("show");
+        $("#modal-photo .dim").addClass("active");
+        $("#modal-photo .new-pre-modal-content").addClass("active");
+
+        photoSlider('init');
+      });
+
+      /* 사진확대보기 모달 닫기 */
+      $("[data-close=modal]").on("click", function () {
+        const $target = $(this).closest(".new-pre-modal");
+        $target.find(".new-pre-modal-content").removeClass("active");
+        $target.find(".dim").removeClass("active");
+
+        setTimeout(function () {
+          $target.removeClass("show");
+          photoSlider('destroy');
+        }, 500)
+      })
     })
   </script>
 </body>
