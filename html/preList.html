@@ -302,6 +302,17 @@
           photoSlider('destroy');
         }, 500)
       })
+
+      /* 스크롤 위아래 효과 */
+      $(".new-pre-zone-details .item").on("")
+      $(document).on("vmousedown", ".new-pre-zone-details .item", function (e) {
+        console.log('mousedown');
+        console.log(e.currentTarget);
+        e.currentTarget.classList.add("animated")
+      });
+      $(document).on("vmouseup", ".new-pre-zone-details .item", function (e) {
+        $(".new-pre-zone-details .item").removeClass("animated")
+      });
     })
   </script>
 </body>
