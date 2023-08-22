@@ -77,12 +77,17 @@
     </div>
     <div class="new-pre-tabs">
       <nav>
-        <ul class="first-tab">
-          <li class="active"><a href=""><span>전체</span></a></li>
-          <li><a href=""><span>접수완료</span></a></li>
-          <li><a href=""><span>처리중</span></a></li>
-          <li><a href=""><span>처리완료</span></a></li>
-        </ul>
+        <div class="rail-wrap first">
+          <div class="rail">
+            <ul class="first-tab">
+              <li class="active"><a href=""><span>전체</span></a></li>
+              <li><a href=""><span>접수완료</span></a></li>
+              <li><a href=""><span>처리중</span></a></li>
+              <li><a href=""><span>처리완료</span></a></li>
+              <li><a href=""><span>처리미대상</span></a></li>
+            </ul>
+          </div>
+        </div>
         <div class="rail-wrap">
           <div class="rail">
             <ul class="second-tab">
@@ -124,7 +129,7 @@
         </div>
       </div>
       <div class="new-pre-list">
-        <section class="new-pre-list-zone">
+        <section class="new-pre-list-zone active">
           <button type="button" class="new-pre-zone">
             <div class="zone-name">
               <span class="tit">거실</span>
@@ -134,16 +139,47 @@
           <div class="new-pre-zone-details">
             <div class="inner">
               <div class="item">
+                <div class="info">
+                  <div class="loca">거실</div>
+                  <div class="date">2023-08-18</div>
+                </div>
                 <div class="desc">
                   거실 도배(벽)찍힘/긁힘
                   도배 : 벽위치(입구 맞은 벽) + 발생부위(중간위치) + 하자상태(찢김)
                 </div>
                 <div class="status">
                   <ol>
-                    <li class="active">접수완료</li>
+                    <li>접수완료</li>
                     <li>처리중</li>
-                    <li>처리완료</li>
+                    <li class="active rejected">미대상</li>
                   </ol>
+                </div>
+                <div class="comment">
+                  <a href="javascript:;" class="comment-toggler" data-is-active="false">내용 보기</a>
+                  <div class="comment-content">
+                    <div class="title">접수하신 내용은 처리 대상이 아닙니다.</div>
+                    <dl class="content">
+                      <dt>사유</dt>
+                      <dd>내집방문행사 이후 일괄시공될 예정입니다.</dd>
+                    </dl>
+                  </div>
+                  <script>
+                    $(".comment-toggler").on("click", function () {
+                      if ($(this).attr("data-is-active") == "false") {
+                        $(this).siblings(".comment-content").show();
+                        $(this).text("내용 닫기");
+                        $(this).attr("data-is-active", "true");
+                      } else {
+                        $(this).siblings(".comment-content").hide();
+                        $(this).text("내용 보기");
+                        $(this).attr("data-is-active", "false");
+                      }
+                      $(".new-pre-zone-details .inner").each(function () {
+                        var height = $(this).outerHeight();
+                        $(this).parent().css("height", height);
+                      });
+                    })
+                  </script>
                 </div>
               </div>
               <div class="item">
@@ -157,8 +193,8 @@
                 </div>
                 <div class="status">
                   <ol>
-                    <li class="active">접수완료</li>
-                    <li>처리중</li>
+                    <li>접수완료</li>
+                    <li class="active">처리중</li>
                     <li>처리완료</li>
                   </ol>
                 </div>

@@ -46,6 +46,11 @@
     box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.08);border-radius: 16px;padding: 24px 16px;
     display: flex;flex-direction: column;gap: 16px;
     transition: transform .2s;
+    .info{
+      display: flex;align-items: center;justify-content: space-between;padding: 0 1rem 1rem;border-bottom: 1px solid $primary;
+      .loca{font-size: 18px;font-weight: 500;color: $primary;}
+      .date{font-size: 14px;color: #000;color: $primary;}
+    }
     .desc{font-size: 14px;font-weight: 500;line-height: 22px;color: #000;}
     .photos{
       display: flex;gap: 10px;width: 100%;
@@ -60,7 +65,7 @@
         }
       }
       li{
-        color: #CDD1D4;font-size: 13px;line-height: 22px;position: relative;
+        color: #CDD1D4;font-size: 13px;line-height: 22px;position: relative;text-align: center;
         &::before{
           content: '';width: 40px;height: 40px;border-radius: 50%;display: block;margin: 0 auto 4px;
           background-color: #CDD1D4;
@@ -78,10 +83,52 @@
           background-image: url("data:image/svg+xml,%3Csvg width='23' height='23' viewBox='0 0 23 23' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M19.9547 5.93719C19.7101 5.6959 19.3796 5.56055 19.0352 5.56055C18.6909 5.56055 18.3604 5.6959 18.1158 5.93719L8.71115 15.317L4.4686 11.0768C4.21786 10.8719 3.89954 10.7672 3.57555 10.7831C3.25157 10.7989 2.94508 10.9342 2.71572 11.1625C2.48635 11.3909 2.35049 11.6961 2.33458 12.0187C2.31867 12.3412 2.42384 12.6582 2.62962 12.9078L7.79167 18.0475C8.03833 18.2849 8.36803 18.4177 8.71115 18.4177C9.05428 18.4177 9.38397 18.2849 9.63064 18.0475L19.9547 7.76818C20.1971 7.52457 20.333 7.19556 20.333 6.85269C20.333 6.50981 20.1971 6.1808 19.9547 5.93719Z' fill='white'/%3E%3C/svg%3E%0A");
         }
         &.active{
-          &::before{
-            background-color: #2f6383;
+          &:nth-child(1){
+            color: #2f6383;
+            &::before{
+              background-color: #2f6383;
+            }
           }
-          color: #2f6383;
+          &:nth-child(2){
+            color: #2f836b;
+            &::before{
+              background-color: #2f836b;
+            }
+          }
+          &:nth-child(3){
+            color: #33d74c;
+            &::before{
+              background-color: #33d74c;
+            }
+          }
+        }
+        &.rejected{
+          color: #e73943 !important;
+          &::before{
+            background-color: #e73943 !important;
+          }
+          &::after{
+            background-image: url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 22 22' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='5' y='10' width='12' height='2.3' rx='1.15' fill='white'/%3E%3C/svg%3E%0A");
+          }
+        }
+      }
+    }
+    .comment{
+      border-top: 1px solid #F4F4F4;padding-top: 1rem;
+      .comment-toggler{color: #2F6383;display: block;text-align: center;}
+      .comment-content{
+        background: #f8f9fc;border-radius: 8px;overflow: hidden;padding: 1rem;display: none;margin-top: 1rem;
+        .title{
+          font-size: 14px;font-weight: 500;color: #151522;text-align: center;
+        }
+        .content{
+          border-top: 2px solid $primary;margin-top: 1rem;padding-top: 1rem;font-size: 14px;line-height: 1.5;
+          display: flex;align-items: center;
+          dt{flex: 0 0 auto;margin-right: 1rem;color: #151522;}
+          dd{
+            flex: 1 1 auto;
+            background: #fff;border: 1px solid $border-color;border-radius: 8px;padding: 9px 12px;color: #151522;
+          }
         }
       }
     }

@@ -12,11 +12,17 @@
   }
   a{display: flex;align-items: center;justify-content: center;}
   .first-tab{
-    border-bottom: 1px solid $border-color;background: #fff;
+    background: #fff;
     li{
-      flex: 1;
+      flex-shrink: 0;min-width: 72px;
+      @media(min-width: 380px){
+        flex: 1;
+      }
       a{
-        font-size: 15px;height: 44px;color: $gray;
+        font-size: 15px;height: 44px;color: $gray;padding: 0 13px;
+        @media(min-width: 380px){
+          padding: 0;
+        }
         span{
           font-weight: 500;position: relative;height: 100%;display: flex;align-items: center;
         }
@@ -37,6 +43,10 @@
   .rail-wrap{
     background: #fff;padding-right: 16px;
     display: flex;align-items: flex-start;box-shadow: 0 2px 2px rgba(0,0,0,0.2);
+    &.first{
+      padding-right: 0;border-bottom: 1px solid $border-color;
+      .rail{padding: 0;}
+    }
   }
   .rail{
     position: relative;padding: 0 16px;
