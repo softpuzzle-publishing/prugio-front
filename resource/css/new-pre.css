@@ -165,15 +165,16 @@ html.title-animated .new-pre-tabs {
   background: #fff;
 }
 .new-pre-tabs .first-tab li {
-  -ms-flex-negative: 0;
-      flex-shrink: 0;
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 auto;
+          flex: 0 0 auto;
   min-width: 72px;
 }
-@media (min-width: 380px) {
+@media (min-width: 391px) {
   .new-pre-tabs .first-tab li {
     -webkit-box-flex: 1;
-        -ms-flex: 1;
-            flex: 1;
+        -ms-flex: 1 1 auto;
+            flex: 1 1 auto;
   }
 }
 .new-pre-tabs .first-tab li a {
@@ -182,7 +183,7 @@ html.title-animated .new-pre-tabs {
   color: #9DA4AA;
   padding: 0 13px;
 }
-@media (min-width: 380px) {
+@media (min-width: 391px) {
   .new-pre-tabs .first-tab li a {
     padding: 0;
   }

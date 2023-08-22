@@ -14,13 +14,13 @@
   .first-tab{
     background: #fff;
     li{
-      flex-shrink: 0;min-width: 72px;
-      @media(min-width: 380px){
-        flex: 1;
+      flex: 0 0 auto;min-width: 72px;
+      @media(min-width: 391px){
+        flex: 1 1 auto;
       }
       a{
         font-size: 15px;height: 44px;color: $gray;padding: 0 13px;
-        @media(min-width: 380px){
+        @media(min-width: 391px){
           padding: 0;
         }
         span{
