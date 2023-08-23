@@ -1047,16 +1047,16 @@ textarea.new-pre-form-control:focus {
   background-color: #2f836b;
 }
 .new-pre-zone-details .item .status li.active:nth-child(3) {
-  color: #33d74c;
+  color: #35c759;
 }
 .new-pre-zone-details .item .status li.active:nth-child(3)::before {
-  background-color: #33d74c;
+  background-color: #35c759;
 }
 .new-pre-zone-details .item .status li.rejected {
-  color: #e73943 !important;
+  color: #ff3b30 !important;
 }
 .new-pre-zone-details .item .status li.rejected::before {
-  background-color: #e73943 !important;
+  background-color: #ff3b30 !important;
 }
 .new-pre-zone-details .item .status li.rejected::after {
   background-image: url("data:image/svg+xml,%3Csvg width='22' height='22' viewBox='0 0 22 22' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='5' y='10' width='12' height='2.3' rx='1.15' fill='white'/%3E%3C/svg%3E%0A");
@@ -1108,10 +1108,8 @@ textarea.new-pre-form-control:focus {
   -webkit-box-flex: 1;
       -ms-flex: 1 1 auto;
           flex: 1 1 auto;
-  background: #fff;
-  border: 1px solid #EEF1F3;
-  border-radius: 8px;
-  padding: 9px 12px;
+  border-left: 1px solid #DCDCDC;
+  padding: 0 0 0 12px;
   color: #151522;
 }
 .new-pre-zone-details .item.animated {
